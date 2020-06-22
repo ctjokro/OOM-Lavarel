@@ -1,0 +1,15 @@
+<!--<div class="pdescc">
+    <?php echo $pageDetail->description;; ?>
+
+</div>-->
+
+<div class="terms-popup-window">
+    <div class="page-title">
+        <?php echo $pageDetail->name;; ?>
+
+    </div>
+    <div class="term-content">
+        <?php echo $pageDetail->description;; ?>
+
+    </div>
+</div>

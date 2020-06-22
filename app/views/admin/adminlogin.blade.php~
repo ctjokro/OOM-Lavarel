@@ -1,0 +1,268 @@
+@extends('adminloginlayout')
+@section('content')
+<div class="container">
+    {{ HTML::ul($errors->all(), array('class'=>'errors'))}}
+    <?php echo Form::open(array('url' => 'admin/login', 'method' => 'post', 'id' => 'login-form', 'class' => 'form form-signin')); ?>
+    <h2 class="form-signin-heading">Administrator Log in</h2>
+    <div class="login-wrap">
+        <div id="login-block"></div>
+        <?php echo Form::text('username', null, array('id' => 'login', 'autofocus' => true, 'class' => "required form-control", 'placeholder' => 'Username')); ?>
+        <?php echo Form::password('password', array('id' => 'pass', 'class' => "required form-control", 'placeholder' => 'Password', 'type' => "password")); ?>
+
+        <label class="checkbox">
+            <input type="checkbox" value="remember-me"> Remember me
+            <span class="pull-right">
+                <a data-toggle="modal" href="#myModal"> Forgot Password?</a>
+            </span>
+        </label>
+        <?php echo Form::submit('Login', array('class' => 'btn btn-lg btn-login btn-block')); ?>
+    </div>
+
+    <!-- Modal -->
+    <div aria-hidden="true" aria-labelledby="myModalLabel" role="dialog" tabindex="-1" id="myModal" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Forgot Password ?</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Enter your e-mail address below to reset your password.</p>
+                    <input type="text" name="email" placeholder="Email" autocomplete="off" class="form-control placeholder-no-fix">
+
+                </div>
+                <div class="modal-footer">
+                    <button data-dismiss="modal" class="btn btn-default" type="button">Cancel</button>
+                    <button class="btn btn-success" type="button">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- modal -->
+
+<!-- js placed at the end of the document so the pages load faster -->
+
+{{ HTML::script('public/js/jquery.js') }}
+{{ HTML::script('public/js/bootstrap.min.js') }}
+{{ HTML::script('public/js/jquery.validate.min.js') }}
+<!-- example login script -->
+<script>
+
+    $(document).ready(function()
+    {
+        function error(message) {
+            return '<div class="alert alert-block alert-danger fade in"><button data-dismiss="alert" class="close close-sm" type="button"><i class="fa fa-times"></i></button>' + message + '</div>'
+        }
+        function success(message) {
+            return '<div class="alert alert-success alert-block fade in"><button data-dismiss="alert" class="close close-sm" type="button"><i class="fa fa-times"></i></button><p>' + message + '</p></div>'
+        }
+
+        function loading(message) {
+            return '<div class="alert alert-info fade in"><button data-dismiss="alert" class="close close-sm" type="button"><i class="fa fa-times"></i></button> <img src="{{ URL::asset("public/img/front") }}/input-spinner.gif" ?>"/> ' + message + ' </div>'
+        }
+
+        // We'll catch form submission to do it in AJAX, but this works also with JS disabled
+//        $('#login-form').submit(function(event)
+//        {
+//            // Stop full page load
+//            event.preventDefault();
+//
+//            // Check fields
+//            var login = $('#login').val();
+//            var pass = $('#pass').val();
+//<?php // if ($check_login) {                                                                          ?>
+//
+//            var captcha = $('#captcha').val();
+//<?php // }                                                                          ?>
+//
+//            if (!login || login.length == 0)
+//            {
+//                $('#login-block').html(error('Please enter your user name'));
+//            }
+//            else if (!pass || pass.length == 0)
+//            {
+//                $('#login-block').html(error('Please enter your password'));
+//            }
+//<?php // if ($check_login) {      ?>
+//
+//            else if (!captcha || captcha.length == 0)
+//            {
+//               // $('#login-block').html(error('Please enter your captcha code'));
+//            }
+//
+//<?php // }      ?>
+//            else
+//            {
+//                // Target url
+//                var target = $(this).attr('action');
+//                if (!target || target == '')
+//                {
+//                    // Page url without hash
+//                    target = document.location.href.match(/^([^#]+)/)[1];
+//                }
+//
+//                // Request
+//                var data = {
+//                    a: $('#a').val(),
+//                    username: login,
+//<?php // if ($check_login) {                                                                         ?>
+//                    captcha: captcha,
+//<?php // }                                                                         ?>
+//                    password: pass,
+//                    'keep-logged': $('#keep-logged').is(':checked') ? 1 : 0
+//                },
+//                redirect = $('#redirect'),
+//                sendTimer = new Date().getTime();
+//                if (redirect.length > 0)
+//                {
+//                    data.redirect = redirect.val();
+//                }
+//
+//                // Send
+//                $.ajax({
+//                    url: target,
+//                    dataType: 'json',
+//                    type: 'POST',
+//                    data: data,
+//                    success: function(data, textStatus, XMLHttpRequest)
+//                    {
+//                        if (data.valid)
+//                        {
+//                            // Small timer to allow the 'checking login' message to show when server is too fast
+//                            var receiveTimer = new Date().getTime();
+//                            if (receiveTimer - sendTimer < 500)
+//                            {
+//                                setTimeout(function()
+//                                {
+//                                    document.location.href = data.redirect;
+//
+//                                }, 500 - (receiveTimer - sendTimer));
+//                            }
+//                            else
+//                            {
+//                                document.location.href = data.redirect;
+//                            }
+//
+//                        }
+//                        else
+//                        {
+//                            if (data.captcha) {
+//                                refreshCaptcha();
+//                                $(".captcha_show").show();
+//                            }
+//                            // Message
+//                            $('#login-block').html(error(data.error) || error('An unexpected error occured, please try again'));
+//
+//                        }
+//                    },
+//                    error: function(XMLHttpRequest, textStatus, errorThrown)
+//                    {
+//                        // Message
+//                        $('#login-block').html(error('Error while contacting server, please try again'));
+//
+//                    }
+//                });
+//
+//                // Message
+//                $('#login-block').html(loading('Please wait, checking login...'));
+//            }
+//        });
+        $('#password-recovery').submit(function(event)
+        {
+            // Stop full page load
+            event.preventDefault();
+
+            // Check fields
+            var login = $('#recovery-mail').val();
+            var emailRegex = new RegExp(/^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$/i);
+            var valid = emailRegex.test(login);
+            if (!login || login.length == 0)
+            {
+                $('#forgotpass-block').html(error('Please enter your email address'));
+            }
+            else if (!valid) {
+                $('#forgotpass-block').html(error('Please enter correct email address'));
+            }
+            else
+            {
+
+                // Target url
+                var target = $(this).attr('action');
+                if (!target || target == '')
+                {
+                    // Page url without hash
+                    target = document.location.href.match(/^([^#]+)/)[1];
+                }
+
+                var captcha = $('#captcha_reset').val();
+                // Request
+                var data = {
+                    a: $('#a').val(),
+                    email: login,
+                    captcha: captcha
+                },
+                redirect = $('#redirect'),
+                sendTimer = new Date().getTime();
+
+                if (redirect.length > 0)
+                {
+                    data.redirect = redirect.val();
+                }
+
+                // Send
+                $.ajax({
+                    url: target,
+                    dataType: 'json',
+                    type: 'POST',
+                    data: data,
+                    success: function(data, textStatus, XMLHttpRequest)
+                    {
+                        if (data.valid)
+                        {
+                            // Small timer to allow the 'checking login' message to show when server is too fast
+                            var receiveTimer = new Date().getTime();
+                            if (receiveTimer - sendTimer < 500)
+                            {
+                                setTimeout(function()
+                                {
+                                    $('#forgotpass-block').html(success(data.message) || success('Please check your email account'));
+
+                                }, 500 - (receiveTimer - sendTimer));
+                            }
+                            else
+                            {
+                                $('#forgotpass-block').html(success(data.message) || success('Please check your email account'));
+                            }
+                        }
+                        else
+                        {
+                            refreshCaptcha();
+                            // Message
+                            $('#forgotpass-block').html(error(data.message) || success('An unexpected error occured, please try again'));
+
+                        }
+                    },
+                    error: function(XMLHttpRequest, textStatus, errorThrown)
+                    {
+                        // Message
+                        $('#forgotpass-block').html(error('Error while contacting server, please try again'));
+
+                    }
+                });
+
+                // Message
+                $('#forgotpass-block').html(loading('Please wait, checking email...'));
+            }
+        });
+    });
+    function refreshCaptcha()
+    {
+
+        var img = document.images['captchaimg'];
+        var img_reset = document.images['captchaimg_reset'];
+        img_reset.src = img.src = img.src.substring(0, img.src.lastIndexOf("?")) + "?rand=" + Math.random() * 1000;
+
+    }
+</script> 
+@stop

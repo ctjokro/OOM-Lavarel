@@ -1,0 +1,95 @@
+<div class="das_sidebar"> 
+<div class="to_left">
+     <?php echo $__env->make('elements/top_menu', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>     
+    <?php
+    $user_id = Session::get('user_id');
+    $userData = DB::table('users')
+            ->where('id', $user_id)
+            ->first();
+
+    $ordeQuery = DB::table('orders');
+    switch ($userData->user_type) {
+        case "Customer":
+            $ordeQuery = DB::table('orders');
+            $ordeQuery->where('orders.user_id', $user_id);
+            $viewAllLink = "order/myorders";
+            $viewLink = "order/view/";
+            break;
+        case "Restaurant":
+            $ordeQuery->where('orders.caterer_id', $user_id);
+            $viewAllLink = "order/receivedorders";
+            $viewLink = "order/receivedview/";
+            break;
+        case "Courier":
+            $ordeQuery->where('orders.courier_id', $user_id);
+            $viewAllLink = "order/courierorders";
+            $viewLink = "order/courierview/";
+            $query = DB::table('order_courier')
+                    ->select("order_courier.*", "users.first_name", "users.last_name", "orders.order_number", "orders.slug as order_slug")
+                    ->join('users', 'users.id', ' = ', 'order_courier.user_id')
+                    ->join('orders', 'orders.id', ' = ', 'order_courier.order_id');
+            $query->where('order_courier.user_id', $user_id);
+            $records = $query->orderBy('order_courier.id', 'desc')->paginate(1);
+
+
+            break;
+    }
+    if($userData->user_type == "Customer"){
+         $orderData = $ordeQuery->orderBy('orders.id', 'desc')->take(1)->get();
+    }else{
+         $orderData = $ordeQuery->orderBy('orders.id', 'desc')->take(1)->get();
+    }
+   
+    ?>
+    <?php if ($userData->user_type == 'Customer' || $userData->user_type == 'Restaurant') { ?>
+        <?php if (!empty($orderData)) { ?>
+            <div class="reset_clsd">
+                <h1>Recent Orders</h1>
+                <ul>
+                    <?php foreach ($orderData as $odata) { ?>
+                        <li>
+                            <div class="rest_bx">
+                                <h3><?php echo $odata->order_number; ?></h3>
+                                <p><?php //echo $odata->status; ?></p>
+                                <?php  if($userData->user_type == "Customer"){ ?>
+                                <span><?php echo html_entity_decode(HTML::link(HTTP_PATH.$viewLink.$odata->slug, "View Details", array('class' => 'orderviewlink'), true)); ?></span>
+                                <?php } else { ?>
+                                <span><?php echo html_entity_decode(HTML::link(HTTP_PATH.$viewLink.$odata->slug, "View Details", array('class' => 'orderviewlink'), true)); ?></span>
+                                <?php } ?>
+                            </div>
+                        </li>
+                    <?php } ?>
+
+                </ul>
+                <div class="vi_all">
+                    <?php echo html_entity_decode(HTML::link(HTTP_PATH.$viewAllLink, "View All", array('class' => 'orderviewlinkall'), true)); ?>
+
+                </div>
+            </div>
+        <?php } ?>
+    <?php } ?>
+
+    <?php if ($userData->user_type == 'Courier') { ?>
+        <?php if (!empty($records)) { ?>
+            <div class="reset_clsd">
+                <h1>Recent Orders</h1>
+                <ul>
+                    <?php foreach ($records as $odata) { ?>
+                        <li>
+                            <div class="rest_bx">
+                                <h3><?php echo $odata->order_number; ?></h3>
+                                <p><?php echo $odata->status; ?></p>
+                                <span><?php echo html_entity_decode(HTML::link(HTTP_PATH.$viewLink.$odata->slug, "View Details", array('class' => 'orderviewlink'), true)); ?></span>
+                            </div>
+                        </li>
+                    <?php } ?>
+
+                </ul>
+                <div class="vi_all">
+                    <?php echo html_entity_decode(HTML::link(HTTP_PATH.$viewAllLink, "View All", array('class' => 'orderviewlinkall'), true)); ?>
+
+                </div>
+            </div>
+        <?php } ?>
+    <?php } ?>
+</div></div>

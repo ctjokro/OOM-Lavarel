@@ -1,0 +1,177 @@
+<div class="carts_bx">
+    <div class="_newcart">
+    <h2>Your Food Basket <span><?php echo $cart->totalItems(); ?></span></h2>
+   
+    <div class="cart_box">
+        <div class="showcartloader" style="display:none;"><img src="<?php echo URL::asset('public/img/front'); ?>/loader.gif" alt="img" /></div>
+        <?php
+        $gtotal = 0;
+         $addonTotal = array();
+        if (!empty($cart_content)) {
+           // echo "<pre>"; print_r($cart_content); exit;
+            // categorized menu according to the carters name
+            $new_cat_array = array();
+            foreach ($cart_content as $cat) {
+                // get menu details
+                $item = DB::table('menu_item')
+                        ->leftjoin('users', 'users.id', '=', 'menu_item.user_id')
+                        ->where('menu_item.id', $cat['id'])
+                        ->select("item_name", "price", "users.id", "users.first_name", "users.last_name", "users.slug")
+                        ->first();
+                $cat['slug'] = $item->slug;
+                $new_cat_array[$item->first_name . " " . $item->last_name][] = $cat;
+            }
+            ?>
+
+        
+            <div class="crt_detal">
+                 <div class="scolc">
+                <?php
+                foreach ($new_cat_array as $carter => $items) {
+                    ?>
+                    <h3><?php echo html_entity_decode(HTML::link('restaurants/menu/' . $items[0]['slug'], $carter, array('target' => '_blank', 'title' => $carter)));; ?></h3>
+                    <ul>
+                        <?php
+                         $total = array();
+                        foreach ($items as $item_detail) {
+                            ?>
+                            <li>
+                                <div class="_ncbvvv">
+                                    <span class="new_detail"><?php echo $item_detail['name']; ?> </span>
+                                    <?php if (!empty($item_detail['submenus'])) { ?>
+                                        <span class="sumsss"><?php echo $item_detail['submenus']; ?> </span>
+                                    <?php } ?>
+                                     <?php 
+                                    
+                                     $addonprice = 0;
+                                     if(isset($item_detail['variant_type'])){
+                                         $explode = explode(',',$item_detail['variant_type']);
+                                         if($explode){
+                                             foreach($explode as $explodeVal){
+                                                   
+                                                  $addonV = DB::table('variants')
+                                                    ->where('variants.id', $explodeVal)
+                                                    ->first();
+                                                  if($addonV){
+                                                   $addonprice = $addonprice + $addonV->price;
+                                                   $addonTotal[] = $addonprice;
+                                                   ?> <div class="top_p"><span class="sumss_new"><i class="fa fa-tag"></i> Variant (<?php echo $addonV->name; ?>) </span> <span class="pricev"><strong><?php echo $addonV->price; ?> </strong><?php echo CURR; ?></span></div><?php
+                                                  }
+                                             }
+                                         }
+                                     }
+                                    //print_r($item_detail); exit;
+                                     if(isset($item_detail['addons'])){
+                                         $explode = explode(',',$item_detail['addons']);
+                                         if($explode){
+                                             foreach($explode as $explodeVal){
+                                                   
+                                                  $addonV = DB::table('addons')
+                                                    ->where('addons.id', $explodeVal)
+                                                    ->first();
+                                                  if($addonV){
+                                                   $addonprice = $addonprice + $addonV->addon_price;
+                                                   $addonTotal[] = $addonprice;
+                                                  ?> <div class="top_p"><span class="sumss_new"><i class="fa fa-tag"></i> Add-on (<?php echo $addonV->addon_name; ?>) </span> <span class="pricev"><strong><?php echo $addonV->addon_price; ?> </strong><?php echo CURR; ?></span></div><?php
+                                                  }
+                                             }
+                                         }
+                                     }
+                                     
+                                     $addonprice = $addonprice * $item_detail['quantity'];
+                                     //echo $addonprice;
+                                     $total[] = $addonprice;
+                                    //print_r($item_detail); exit;
+                                     
+                                     ?>
+                                </div>
+                                <div class="removelinkcont"><a href="javascript:void(0)" alt="<?php echo $item_detail['id']; ?>" class="remove_cart"><i class="fa fa-close"></i></a></div>
+                                <div class="hird0">
+                                    <div class="commentlink"><a href="javascript:void(0)" class="leave_comment" alt="<?php echo $item_detail['id']; ?>"><i class="fa fa-edit"></i>Comment</a></div>
+                                    <div class="left_main">
+                                        <input type="button" value="-" data-addon="<?php echo $item_detail['addons'] ?>" data-vaiant="<?php echo $item_detail['variant_type'] ?>" class="but_1 counter_number2"  id_val="<?php echo $item_detail['id']; ?>"  alt="minus" /><input readonly="readonly" maxlength="3" type="text" value="<?php echo isset($key_array[$item_detail['id']]) ? $key_array[$item_detail['id']] : 0; ?>" class='<?php echo "preparation_time_" . $item_detail['id']; ?>' />
+                                        <input type="button" value="+" data-addon="<?php echo $item_detail['addons'] ?>" data-vaiant="<?php echo $item_detail['variant_type'] ?>" class="but_2 counter_number2" id_val="<?php echo $item_detail['id']; ?>"  alt="plus" />
+                                    </div>
+                                    <div class="maininfocontainer">
+
+                                        <div class="right_main"><strong><?php echo $addonprice; ?> </strong><?php echo CURR; ?></div>
+                                    </div>
+                                </div>
+                                <div class="comment-box" style="display:none" id="comment-box-<?php echo $item_detail['id']; ?>" alt="<?php echo $item_detail['id']; ?>">
+                                    <?php echo Form::textarea('comment', (isset($item_detail['comment'])?$item_detail['comment']:""),  array('class' => 'small-comment', 'alt'=>$item_detail['id'])); ?>
+
+                                </div>
+                            </li>
+                        <?php } ?>
+                    </ul>
+                <?php } 
+                ?>
+            </div>
+                <div class = "chus">
+                    <div class = "summary">
+                        <strong>Total</strong>
+                        <p ><strong data-total="<?php echo array_sum($total); ?>"><?php echo App::make("HomeController")->numberformat(array_sum($total) ,2); ?></strong><?php echo CURR; ?></p>
+                    </div>
+                </div>
+                
+                <?php
+                $gtotal = array_sum($total);
+
+                // check coupon code if added
+                $coupon = Session::get('coupon');
+                $coupon_detail = DB::table('coupons')
+                        ->where('code', $coupon)
+                        ->where('start_time', "<=", date('Y-m-d'))
+                        ->where('end_time', ">=", date('Y-m-d'))
+                        ->where('status', '1')
+                        ->first();
+                if (!empty($coupon_detail)) {
+                    $discount = $gtotal * $coupon_detail->discount / 100;
+                    $gtotal = $gtotal - $discount;
+                    ?>
+                    <div class = "summary">
+                        <strong>Discount (<?php echo $coupon_detail->discount."%"; ?>)</strong>
+                        <p><strong> - <?php echo App::make("HomeController")->numberformat($discount ,2); ?></strong><?php echo CURR; ?></p>
+                    </div>
+                    <input type="hidden" name="discount" value="<?php echo $discount; ?>" />
+                    <?php
+                }
+                
+                $adminData = DB::table('admins')
+        ->where('id', '1')
+        ->first();
+               // echo $gtotal;
+                ?>
+                <?php
+                if ($adminData->is_tax == 1) {
+                    $tax_per = $adminData->tax;
+                    $tax_amount = $tax_per * $gtotal / 100;
+                    $gtotal = $gtotal + $tax_amount;
+                    ?>
+                    <div class = "summary">
+                        <strong>Tax</strong>
+                        <p><strong><?php echo App::make("HomeController")->numberformat($tax_amount ,2); ?></strong><?php echo CURR; ?></p>
+                    </div>
+                    <input type="hidden" value="<?php echo $tax_amount; ?>" name="tax" id="taxwf">
+                <?php } else { ?>
+                    <input type="hidden" name="tax" value="0" id="taxwf">
+                <?php } ?>
+                <div class="submit-form">
+                    <?php echo html_entity_decode(HTML::link('order/confirm', "Order", array('title' => "Order", "class" => "btn btn-primary")));; ?>
+
+                </div>
+            </div>
+            <?php
+        } else {
+            ?>
+            <div class="cart_img"><img src="<?php echo URL::asset('public/img/front'); ?>/cart_img.png" alt="img" /></div>
+            <div class="cart_txt">Your food basket is empty</div>
+            <div class="add-others centerother">
+                <a class="btn btn-primary" title="Add items" href="<?php echo HTTP_PATH; ?>restaurants/list">Add Items</a>
+            </div>
+            <?php
+        }
+        ?>
+    </div>
+    </div>
+</div>

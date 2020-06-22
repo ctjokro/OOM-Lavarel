@@ -1,0 +1,4 @@
+[17-Oct-2019 03:02:45 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 13608 bytes) in /home/onlineorder/public_html/public/assets/timthumb.php on line 1085
+[18-Oct-2019 01:12:01 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 11996 bytes) in /home/onlineorder/public_html/public/assets/timthumb.php on line 1085
+[18-Oct-2019 01:12:01 UTC] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 2999 bytes) in /home/onlineorder/public_html/public/assets/timthumb.php on line 1085
+[20-Jun-2020 12:49:22 UTC] PHP Warning:  imagepng(): gd-png error: compression level must be 0 through 9 in /home/onlineorder/public_html/public/assets/timthumb.php on line 747

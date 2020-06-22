@@ -1,0 +1,20 @@
+<?php $__env->startSection('title', 'Administrator :: '.TITLE_FOR_PAGES.'Add Restaurant'); ?>
+<?php $__env->startSection('content'); ?>
+<div class="clear"></div>
+<div class="stade">
+    <div class="wrapper">
+        <?php if (!empty($pageDetail)) { ?>
+            <div class="ptitle"><h1>
+                    <?php echo $pageDetail->name;; ?>
+
+                </h1>
+            </div>
+            <div class="pdescc">
+                <?php echo $pageDetail->description;; ?>
+
+            </div>
+        <?php } ?>
+    </div>
+</div>
+<div class="clear"></div>
+<?php $__env->stopSection(); ?>

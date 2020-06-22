@@ -1,0 +1,691 @@
+<?php $__env->startSection('content'); ?>
+<?php echo HTML::style('public/js/front/timepicker/jquery.timepicker.css');; ?>
+
+<?php echo HTML::style('public/js/chosen/chosen.css');; ?>
+
+<?php echo HTML::script('public/js/front/timepicker/jquery.timepicker.js');; ?>
+
+<!--
+<?php echo HTML::script('public/js/date_jquerytimepicker.js');; ?>
+
+<?php echo HTML::style('public/css/date_jquerytimepicker.css');; ?>
+
+<?php echo HTML::script('public/js/date_jquery.min.js');; ?>
+
+ -->
+<style>
+@media  screen and (max-width: 767px) {
+ label {
+    display: block;
+}
+.menu_table ul li {
+    width: 100% !important;
+} 
+}
+span.lunch {
+    padding-left: 21px;
+}
+span.dinner {
+    padding-left: 42px;
+}
+</style>
+<script type="text/javascript">
+    $(document).ready(function () {
+        
+        $.validator.addMethod('positiveNumber',
+        function (value) {
+            return Number(value) > 0;
+        }, 'Enter a positive number.');
+        $('#myform').validate();
+        $('.start_time').timepicker({'timeFormat': 'h:i a', 'step': 30, 'minTime': '01:00am', 'maxTime': '12:59am'});
+        $('.end_time').timepicker({'timeFormat': 'h:i a', 'step': 30, 'minTime': '01:00am', 'maxTime': '12:59am'});
+    });
+
+    $(document).ready(function () {
+        $(".cb-enable").click(function () {
+            var parent = $(this).parents('.switch');
+            $('.cb-disable', parent).removeClass('selected');
+            $(this).addClass('selected');
+            $('.checkbox', parent).attr('checked', true);
+        });
+        $(".cb-disable").click(function () {
+            var parent = $(this).parents('.switch');
+            $('.cb-enable', parent).removeClass('selected');
+            $(this).addClass('selected');
+            $('.checkbox', parent).attr('checked', false);
+        });
+    });
+    function chkselect(val) {
+        if (val == '') {
+            $('#selectop :selected').attr('selected', '');
+
+        }
+    }
+
+ /*$(function() {
+                $('#basicExample').timepicker();
+            });
+            $(function() {
+                $('#basicExample1').timepicker();
+            });    
+
+(function($) {
+    $(function() {
+        $('input.timepicker').timepicker();
+    });
+})(jQuery);
+*/
+</script>
+
+<style>
+    .cb-enable, .cb-disable, .cb-enable span, .cb-disable span { background: url(<?php echo HTTP_PATH . "public/css/front/" ?>switch.gif) repeat-x; display: block; float: left; }
+    .cb-enable span, .cb-disable span { line-height: 30px; display: block; background-repeat: no-repeat; font-weight: bold; }
+    .cb-enable span { background-position: left -90px; padding: 0 10px; }
+    .cb-disable span { background-position: right -180px;padding: 0 10px; }
+    .cb-disable.selected { background-position: 0 -30px; }
+    .cb-disable.selected span { background-position: right -210px; color: #fff; }
+    .cb-enable.selected { background-position: 0 -60px; }
+    .cb-enable.selected span { background-position: left -150px; color: #fff; }
+    .switch label { cursor: pointer; }
+    .switch input { display: none; }
+    
+    
+
+</style>
+
+<section>
+    <div class="top_menus">
+        <div class="dash_toppart">
+            <div class="wrapper"> 
+                <div class="_cttv">
+                    <?php echo $__env->make('elements/left_menu', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
+
+
+                </div></div></div>
+        <div class="wrapper">
+
+            <div class="acc_bar acc_bar_new">
+                <?php echo $__env->make('elements/oderc_menu', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?> 
+
+                <div class="informetion informetion_new">
+                    <div style="width:100%" class="informetion_top">
+                        <div class="tatils">Manage Opening Hours</div>
+                        <div class="pery">
+                            <div id="formloader" class="formloader" style="display: none;">
+                                <?php echo HTML::image('public/img/loader_large_blue.gif','', array()); ?>
+
+                            </div>
+                            <?php echo View::make('elements.frontEndActionMessage')->render(); ?>
+
+                            <?php echo Form::model($opening_hours, array('url' => '/user/openinghours', 'method' => 'post', 'id' => 'myform', 'files' => true,'class'=>"cmxform form-horizontal tasi-form form")); ?>
+
+                            <span class="require" style="float: left;width: 100%;">* Please note that all fields that have an asterisk (*) are required. </span>
+                            <div class="fill_data_left">
+                                <div class="user_data">
+                                    <div class="label">Restaurant Status <span class="red-mark"> *</span></div>
+                                    <div class="detail">
+
+                                        <p class="field switch">
+                                            <label class="cb-enable <?php echo @$opening_hours->open_close?'selected':''; ?>"><span onclick="valueChanged(1);">On</span></label>
+                                            <label class="cb-disable  <?php echo @$opening_hours->open_close?'':'selected'; ?>"><span onclick="valueChanged(0);">Off</span></label>
+                                            <?php echo Form::checkbox('open_close', 1, (@$opening_hours->open_close?TRUE:FALSE), ['id' => 'checkbox', 'class'=>'checkbox']); ?>
+
+                                        </p>
+                                        <div class="hint-onoff">
+<!--                                            If you turn your status off this will override your opening hours and no customers will be able to order!-->
+                                        </div>
+                                        
+                                         <span class="hint-onoff hint-onoff_highlight require" style="display:none">
+                                            Kindly mark the restaurant status On to set the opening days and opening hours of restaurant.
+                                        </span>
+                                    </div>
+
+                                    <div class="label">Open Days <span class="red-mark"> *</span></div>
+                                    <div class="detail">
+                                        <?php
+                                        $array = array('mon' => 'Monday', 'tue' => 'Tuesday', 'wed' => 'Wednesday', 'thu' => 'Thursday', 'fri' => 'Friday', 'sat' => 'Saturday', 'sun' => 'Sunday');
+                                        ?>
+                                        <?php echo Form::select('open_days[]', $array,  explode(',', @$opening_hours->open_days), array('multiple' => true, 'class'=>'chzn-select'));; ?>
+
+                                    </div>
+                                    <div class="labeles">
+                                        Lunch and Dinner Hours <span class="red-mark"> *</span>
+                                    </div>
+                                    <div class="detail" id="detail_field_page"> 
+                                        <div class="menu_table menu_tablese menu_tablesefgt">
+                                            <div class="row"> 
+                                            <div class="col-md-1"></div>
+                                            <div class="col-md-3">
+                                            <span class="break_fast">   <label>Breakfast Time </label> </span>
+                                            </div>
+                                            <div class="col-md-3">
+                                            <span class="lunch">   <label>Lunch Time </label> </span>
+                                            </div>
+                                            
+                                            <div class="col-md-5">
+                                            <span class="dinner">   <label>Dinner Time </label> </span>
+                                            </div> 
+                                            </div>
+                                       <!--<p><input id="basicExample" type="text" class="time"  /> <input id="basicExample1" type="text" class="time" /></p>
+                                       <input type="text" class="timepicker" name="time"/>
+                                       -->
+
+                                            <?php
+                                            $openday = explode(',', @$opening_hours->open_days);
+                                            $vrrcy = explode(',', @$opening_hours->start_time);
+                                            $endty = explode(',', @$opening_hours->end_time);
+                                            $breakfast = explode(',', @$opening_hours->breakfast_time);
+                                            $startime = array_combine($openday, $vrrcy);
+                                            $endtime = array_combine($openday, $endty);
+                                            $breakfast_time = array_combine($openday, $breakfast);
+                                            
+
+                                            foreach ($array as $vardhbb => $value) {
+                                                $bloack = "block";
+                                                if (!in_array($vardhbb, $openday)) {
+                                                    $bloack = "none";
+                                                }
+                                                ?>
+                                                
+                                                <ul id="<?php echo $vardhbb; ?>_div" style="display: <?php echo $bloack; ?>">
+                                                  <!--  <li>  -->
+                                                     <span class="days_left">   <label style="width:8%"> <?php echo $value; ?> </label> </span>
+                                                     
+                                                     
+                                                 <!--   </li>  -->
+                                                    <li style="width: 28%;">
+                                                        
+                                                      <?php echo Form::hidden('open_days_label[]', $vardhbb, array('class' => 'start_time required form-control','placeholder'=>"Start Time")); ?>    
+                                                      <select class="start_time1 required form-control" name="breakfast_time[<?php echo $vardhbb; ?>]" placeholder="Breakfast Time" style="width: 42%;">
+                                                          <option value="24:00:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],0,8) =='24:00:00') { echo "selected"; } ?>>12:00 am </option>
+                                                        	<option value="00:30:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],0,8) =='00:30:00') { echo "selected"; } ?> >12:30 am </option>
+                                                        	<option value="01:00:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],0,8) =='01:00:00') { echo "selected"; } ?> >01:00 am </option>
+                                                        	<option value="01:30:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],0,8) =='01:30:00') { echo "selected"; } ?> >01:30 am </option>
+                                                        	<option value="02:00:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],0,8) =='02:00:00') { echo "selected"; } ?> >02:00 am </option>
+                                                        	<option value="02:30:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],0,8) =='02:30:00') { echo "selected"; } ?> >02:30 am </option>
+                                                        	<option value="03:00:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],0,8) =='03:00:00') { echo "selected"; } ?> >03:00 am </option>
+                                                        	<option value="03:30:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],0,8) =='03:30:00') { echo "selected"; } ?> >03:30 am </option>
+                                                        	<option value="04:00:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],0,8) =='04:00:00') { echo "selected"; } ?> >04:00 am </option>
+                                                        	<option value="04:30:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],0,8) =='04:30:00') { echo "selected"; } ?> >04:30 am </option>
+                                                        	<option value="05:00:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],0,8) =='05:00:00') { echo "selected"; } ?> >05:00 am </option>
+                                                        	<option value="05:30:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],0,8) =='05:30:00 ') { echo "selected"; } ?> >05:30 am </option>
+                                                        	<option value="06:00:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],0,8) =='06:00:00') { echo "selected"; } ?> >06:00 am </option>
+                                                        	<option value="06:30:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],0,8) =='06:30:00') { echo "selected"; } ?> >06:30 am </option>
+                                                        	<option value="07:00:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],0,8) =='07:00:00') { echo "selected"; } ?> >07:00 am </option>
+                                                        	<option value="07:30:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],0,8) =='07:30:00') { echo "selected"; } ?> >07:30 am </option>
+                                                        	<option value="08:00:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],0,8) =='08:00:00') { echo "selected"; } ?> >08:00 am </option>
+                                                        	<option value="08:30:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],0,8) =='08:30:00') { echo "selected"; } ?> >08:30 am </option>
+                                                        	<option value="09:00:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],0,8) =='09:00:00') { echo "selected"; } ?> >09:00 am </option>
+                                                        	<option value="09:30:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],0,8) =='09:30:00') { echo "selected"; } ?> >09:30 am </option>
+                                                        	<option value="10:00:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],0,8) =='10:00:00') { echo "selected"; } ?> >10:00 am </option>
+                                                        	<option value="10:30:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],0,8) =='10:30:00') { echo "selected"; } ?> >10:30 am </option>
+                                                        	<option value="11:00:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],0,8) =='11:00:00 ') { echo "selected"; } ?> >11:00 am </option>
+                                                        	<option value="11:30:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],0,8) =='11:30:00') { echo "selected"; } ?> >11:30 am </option>
+                                                        	<option value="12:00:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],0,8) =='12:00:00') { echo "selected"; } ?> >12:00 pm </option>
+                                                        	<option value="12:30:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],0,8) =='12:30:00') { echo "selected"; } ?> >12:30 pm </option>
+                                                        	<option value="13:00:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],0,8) =='13:00:00') { echo "selected"; } ?> >01:00 pm </option>
+                                                        	<option value="13:30:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],0,8) =='13:30:00') { echo "selected"; } ?> >01:30 pm </option>
+                                                        	<option value="14:00:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],0,8) =='14:00:00') { echo "selected"; } ?> >02:00 pm </option>
+                                                        	<option value="14:30:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],0,8) =='14:30:00') { echo "selected"; } ?> >02:30 pm </option>
+                                                        	<option value="15:00:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],0,8) =='15:00:00') { echo "selected"; } ?> >03:00 pm </option>
+                                                        	<option value="15:30:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],0,8) =='15:30:00') { echo "selected"; } ?> >03:30 pm </option>
+                                                        	<option value="16:00:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],0,8) =='16:00:00') { echo "selected"; } ?> >04:00 pm </option>
+                                                        	<option value="16:30:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],0,8) =='16:30:00') { echo "selected"; } ?> >04:30 pm </option>
+                                                        	<option value="17:00:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],0,8) =='17:00:00') { echo "selected"; } ?> >05:00 pm </option>
+                                                        	<option value="17:30:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],0,8) =='17:30:00') { echo "selected"; } ?> >05:30 pm </option>
+                                                        	<option value="18:00:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],0,8) =='18:00:00') { echo "selected"; } ?> >06:00 pm </option>
+                                                        	<option value="18:30:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],0,8) =='18:30:00') { echo "selected"; } ?> >06:30 pm </option>
+                                                        	<option value="19:00:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],0,8) =='19:00:00') { echo "selected"; } ?> >07:00 pm </option>
+                                                        	<option value="19:30:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],0,8) =='19:30:00') { echo "selected"; } ?> >07:30 pm </option>
+                                                        	<option value="20:00:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],0,8) =='20:00:00') { echo "selected"; } ?> >08:00 pm </option>
+                                                        	<option value="20:30:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],0,8) =='20:30:00 ') { echo "selected"; } ?> >08:30 pm </option>
+                                                        	<option value="21:00:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],0,8) =='21:00:00') { echo "selected"; } ?> >09:00 pm </option>
+                                                        	<option value="21:30:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],0,8) =='21:30:00') { echo "selected"; } ?> >09:30 pm </option>
+                                                        	<option value="22:00:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],0,8) =='22:00:00') { echo "selected"; } ?> >10:00 pm </option>
+                                                        	<option value="22:30:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],0,8) =='22:30:00') { echo "selected"; } ?> >10:30 pm </option>
+                                                        	<option value="23:00:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],0,8) =='23:00:00') { echo "selected"; } ?> >11:00 pm </option>
+                                                        	<option value="23:30:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],0,8) =='23:30:00') { echo "selected"; } ?> >11:30 pm </option> 
+                                                            </select>
+                                                            
+                                                            <!------------------------------------My breakfast_time_end here------------------------------>
+                                                            
+                                                        <select class="start_time1 required form-control" name="breakfast_time_end[<?php echo $vardhbb; ?>]" placeholder="Breakfast Time" style="width: 42%;">
+                                                            <option value="24:00:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],9,8) =='24:00:00') { echo "selected"; } ?>>12:00 am </option>
+                                                        	<option value="00:30:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],9,8) =='00:30:00') { echo "selected"; } ?> >12:30 am </option>
+                                                        	<option value="01:00:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],9,8) =='01:00:00') { echo "selected"; } ?> >01:00 am </option>
+                                                        	<option value="01:30:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],9,8) =='01:30:00') { echo "selected"; } ?> >01:30 am </option>
+                                                        	<option value="02:00:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],9,8) =='02:00:00') { echo "selected"; } ?> >02:00 am </option>
+                                                        	<option value="02:30:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],9,8) =='02:30:00') { echo "selected"; } ?> >02:30 am </option>
+                                                        	<option value="03:00:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],9,8) =='03:00:00') { echo "selected"; } ?> >03:00 am </option>
+                                                        	<option value="03:30:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],9,8) =='03:30:00') { echo "selected"; } ?> >03:30 am </option>
+                                                        	<option value="04:00:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],9,8) =='04:00:00') { echo "selected"; } ?> >04:00 am </option>
+                                                        	<option value="04:30:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],9,8) =='04:30:00') { echo "selected"; } ?> >04:30 am </option>
+                                                        	<option value="05:00:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],9,8) =='05:00:00') { echo "selected"; } ?> >05:00 am </option>
+                                                        	<option value="05:30:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],9,8) =='05:30:00 ') { echo "selected"; } ?> >05:30 am </option>
+                                                        	<option value="06:00:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],9,8) =='06:00:00') { echo "selected"; } ?> >06:00 am </option>
+                                                        	<option value="06:30:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],9,8) =='06:30:00') { echo "selected"; } ?> >06:30 am </option>
+                                                        	<option value="07:00:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],9,8) =='07:00:00') { echo "selected"; } ?> >07:00 am </option>
+                                                        	<option value="07:30:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],9,8) =='07:30:00') { echo "selected"; } ?> >07:30 am </option>
+                                                        	<option value="08:00:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],9,8) =='08:00:00') { echo "selected"; } ?> >08:00 am </option>
+                                                        	<option value="08:30:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],9,8) =='08:30:00') { echo "selected"; } ?> >08:30 am </option>
+                                                        	<option value="09:00:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],9,8) =='09:00:00') { echo "selected"; } ?> >09:00 am </option>
+                                                        	<option value="09:30:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],9,8) =='09:30:00') { echo "selected"; } ?> >09:30 am </option>
+                                                        	<option value="10:00:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],9,8) =='10:00:00') { echo "selected"; } ?> >10:00 am </option>
+                                                        	<option value="10:30:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],9,8) =='10:30:00') { echo "selected"; } ?> >10:30 am </option>
+                                                        	<option value="11:00:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],9,8) =='11:00:00 ') { echo "selected"; } ?> >11:00 am </option>
+                                                        	<option value="11:30:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],9,8) =='11:30:00') { echo "selected"; } ?> >11:30 am </option>
+                                                        	<option value="12:00:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],9,8) =='12:00:00') { echo "selected"; } ?> >12:00 pm </option>
+                                                        	<option value="12:30:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],9,8) =='12:30:00') { echo "selected"; } ?> >12:30 pm </option>
+                                                        	<option value="13:00:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],9,8) =='13:00:00') { echo "selected"; } ?> >01:00 pm </option>
+                                                        	<option value="13:30:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],9,8) =='13:30:00') { echo "selected"; } ?> >01:30 pm </option>
+                                                        	<option value="14:00:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],9,8) =='14:00:00') { echo "selected"; } ?> >02:00 pm </option>
+                                                        	<option value="14:30:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],9,8) =='14:30:00') { echo "selected"; } ?> >02:30 pm </option>
+                                                        	<option value="15:00:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],9,8) =='15:00:00') { echo "selected"; } ?> >03:00 pm </option>
+                                                        	<option value="15:30:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],9,8) =='15:30:00') { echo "selected"; } ?> >03:30 pm </option>
+                                                        	<option value="16:00:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],9,8) =='16:00:00') { echo "selected"; } ?> >04:00 pm </option>
+                                                        	<option value="16:30:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],9,8) =='16:30:00') { echo "selected"; } ?> >04:30 pm </option>
+                                                        	<option value="17:00:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],9,8) =='17:00:00') { echo "selected"; } ?> >05:00 pm </option>
+                                                        	<option value="17:30:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],9,8) =='17:30:00') { echo "selected"; } ?> >05:30 pm </option>
+                                                        	<option value="18:00:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],9,8) =='18:00:00') { echo "selected"; } ?> >06:00 pm </option>
+                                                        	<option value="18:30:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],9,8) =='18:30:00') { echo "selected"; } ?> >06:30 pm </option>
+                                                        	<option value="19:00:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],9,8) =='19:00:00') { echo "selected"; } ?> >07:00 pm </option>
+                                                        	<option value="19:30:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],9,8) =='19:30:00') { echo "selected"; } ?> >07:30 pm </option>
+                                                        	<option value="20:00:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],9,8) =='20:00:00') { echo "selected"; } ?> >08:00 pm </option>
+                                                        	<option value="20:30:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],9,8) =='20:30:00 ') { echo "selected"; } ?> >08:30 pm </option>
+                                                        	<option value="21:00:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],9,8) =='21:00:00') { echo "selected"; } ?> >09:00 pm </option>
+                                                        	<option value="21:30:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],9,8) =='21:30:00') { echo "selected"; } ?> >09:30 pm </option>
+                                                        	<option value="22:00:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],9,8) =='22:00:00') { echo "selected"; } ?> >10:00 pm </option>
+                                                        	<option value="22:30:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],9,8) =='22:30:00') { echo "selected"; } ?> >10:30 pm </option>
+                                                        	<option value="23:00:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],9,8) =='23:00:00') { echo "selected"; } ?> >11:00 pm </option>
+                                                        	<option value="23:30:00" <?php if(isset($breakfast_time[$vardhbb]) && !empty($breakfast_time[$vardhbb]) && substr($breakfast_time[$vardhbb],9,8) =='23:30:00') { echo "selected"; } ?> >11:30 pm </option> 
+                                                            </select>
+                                                            <!------------------------------------My breakfast_time_end start here------------------------------>
+                                                         
+                                                    </li>
+                                                    <li style="width: 28%;">
+                                                        <select class="start_time1 required form-control" name="start_time[<?php echo $vardhbb; ?>]" placeholder="Start Time" style="width: 42%;">
+                                                          <option value="24:00:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],0,8) =='24:00:00') { echo "selected"; } ?>>12:00 am </option>
+<option value="00:30:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],0,8) =='00:30:00') { echo "selected"; } ?> >12:30 am </option>
+<option value="01:00:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],0,8) =='01:00:00') { echo "selected"; } ?> >01:00 am </option>
+<option value="01:30:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],0,8) =='01:30:00') { echo "selected"; } ?> >01:30 am </option>
+<option value="02:00:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],0,8) =='02:00:00') { echo "selected"; } ?> >02:00 am </option>
+<option value="02:30:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],0,8) =='02:30:00') { echo "selected"; } ?> >02:30 am </option>
+<option value="03:00:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],0,8) =='03:00:00') { echo "selected"; } ?> >03:00 am </option>
+<option value="03:30:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],0,8) =='03:30:00') { echo "selected"; } ?> >03:30 am </option>
+<option value="04:00:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],0,8) =='04:00:00') { echo "selected"; } ?> >04:00 am </option>
+<option value="04:30:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],0,8) =='04:30:00') { echo "selected"; } ?> >04:30 am </option>
+<option value="05:00:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],0,8) =='05:00:00') { echo "selected"; } ?> >05:00 am </option>
+<option value="05:30:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],0,8) =='05:30:00 ') { echo "selected"; } ?> >05:30 am </option>
+<option value="06:00:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],0,8) =='06:00:00') { echo "selected"; } ?> >06:00 am </option>
+<option value="06:30:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],0,8) =='06:30:00') { echo "selected"; } ?> >06:30 am </option>
+<option value="07:00:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],0,8) =='07:00:00') { echo "selected"; } ?> >07:00 am </option>
+<option value="07:30:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],0,8) =='07:30:00') { echo "selected"; } ?> >07:30 am </option>
+<option value="08:00:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],0,8) =='08:00:00') { echo "selected"; } ?> >08:00 am </option>
+<option value="08:30:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],0,8) =='08:30:00') { echo "selected"; } ?> >08:30 am </option>
+<option value="09:00:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],0,8) =='09:00:00') { echo "selected"; } ?> >09:00 am </option>
+<option value="09:30:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],0,8) =='09:30:00') { echo "selected"; } ?> >09:30 am </option>
+<option value="10:00:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],0,8) =='10:00:00') { echo "selected"; } ?> >10:00 am </option>
+<option value="10:30:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],0,8) =='10:30:00') { echo "selected"; } ?> >10:30 am </option>
+<option value="11:00:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],0,8) =='11:00:00 ') { echo "selected"; } ?> >11:00 am </option>
+<option value="11:30:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],0,8) =='11:30:00') { echo "selected"; } ?> >11:30 am </option>
+<option value="12:00:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],0,8) =='12:00:00') { echo "selected"; } ?> >12:00 pm </option>
+<option value="12:30:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],0,8) =='12:30:00') { echo "selected"; } ?> >12:30 pm </option>
+<option value="13:00:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],0,8) =='13:00:00') { echo "selected"; } ?> >01:00 pm </option>
+<option value="13:30:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],0,8) =='13:30:00') { echo "selected"; } ?> >01:30 pm </option>
+<option value="14:00:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],0,8) =='14:00:00') { echo "selected"; } ?> >02:00 pm </option>
+<option value="14:30:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],0,8) =='14:30:00') { echo "selected"; } ?> >02:30 pm </option>
+<option value="15:00:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],0,8) =='15:00:00') { echo "selected"; } ?> >03:00 pm </option>
+<option value="15:30:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],0,8) =='15:30:00') { echo "selected"; } ?> >03:30 pm </option>
+<option value="16:00:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],0,8) =='16:00:00') { echo "selected"; } ?> >04:00 pm </option>
+<option value="16:30:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],0,8) =='16:30:00') { echo "selected"; } ?> >04:30 pm </option>
+<option value="17:00:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],0,8) =='17:00:00') { echo "selected"; } ?> >05:00 pm </option>
+<option value="17:30:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],0,8) =='17:30:00') { echo "selected"; } ?> >05:30 pm </option>
+<option value="18:00:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],0,8) =='18:00:00') { echo "selected"; } ?> >06:00 pm </option>
+<option value="18:30:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],0,8) =='18:30:00') { echo "selected"; } ?> >06:30 pm </option>
+<option value="19:00:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],0,8) =='19:00:00') { echo "selected"; } ?> >07:00 pm </option>
+<option value="19:30:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],0,8) =='19:30:00') { echo "selected"; } ?> >07:30 pm </option>
+<option value="20:00:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],0,8) =='20:00:00') { echo "selected"; } ?> >08:00 pm </option>
+<option value="20:30:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],0,8) =='20:30:00 ') { echo "selected"; } ?> >08:30 pm </option>
+<option value="21:00:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],0,8) =='21:00:00') { echo "selected"; } ?> >09:00 pm </option>
+<option value="21:30:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],0,8) =='21:30:00') { echo "selected"; } ?> >09:30 pm </option>
+<option value="22:00:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],0,8) =='22:00:00') { echo "selected"; } ?> >10:00 pm </option>
+<option value="22:30:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],0,8) =='22:30:00') { echo "selected"; } ?> >10:30 pm </option>
+<option value="23:00:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],0,8) =='23:00:00') { echo "selected"; } ?> >11:00 pm </option>
+<option value="23:30:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],0,8) =='23:30:00') { echo "selected"; } ?> >11:30 pm </option> 
+                                                            </select>
+                                                   <!--     <?php echo Form::text('start_time['.$vardhbb.']', (isset($startime[$vardhbb]) && $startime[$vardhbb])?$startime[$vardhbb]:"", array('class' => 'start_time1 required form-control','placeholder'=>"Start Time")); ?>
+
+                                                   -->
+                                                    <!------------------------------------My start_time start here------------------------------>
+                                                    
+                                                     <select class="start_time1 required form-control" name="start_time_end[<?php echo $vardhbb; ?>]" placeholder="Start Time" style="width: 42%;">
+                                                            <option value="24:00:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],9,8) =='24:00:00') { echo "selected"; } ?>>12:00 am </option>
+<option value="00:30:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],9,8) =='00:30:00') { echo "selected"; } ?> >12:30 am </option>
+<option value="01:00:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],9,8) =='01:00:00') { echo "selected"; } ?> >01:00 am </option>
+<option value="01:30:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],9,8) =='01:30:00') { echo "selected"; } ?> >01:30 am </option>
+<option value="02:00:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],9,8) =='02:00:00') { echo "selected"; } ?> >02:00 am </option>
+<option value="02:30:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],9,8) =='02:30:00') { echo "selected"; } ?> >02:30 am </option>
+<option value="03:00:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],9,8) =='03:00:00') { echo "selected"; } ?> >03:00 am </option>
+<option value="03:30:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],9,8) =='03:30:00') { echo "selected"; } ?> >03:30 am </option>
+<option value="04:00:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],9,8) =='04:00:00') { echo "selected"; } ?> >04:00 am </option>
+<option value="04:30:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],9,8) =='04:30:00') { echo "selected"; } ?> >04:30 am </option>
+<option value="05:00:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],9,8) =='05:00:00') { echo "selected"; } ?> >05:00 am </option>
+<option value="05:30:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],9,8) =='05:30:00 ') { echo "selected"; } ?> >05:30 am </option>
+<option value="06:00:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],9,8) =='06:00:00') { echo "selected"; } ?> >06:00 am </option>
+<option value="06:30:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],9,8) =='06:30:00') { echo "selected"; } ?> >06:30 am </option>
+<option value="07:00:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],9,8) =='07:00:00') { echo "selected"; } ?> >07:00 am </option>
+<option value="07:30:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],9,8) =='07:30:00') { echo "selected"; } ?> >07:30 am </option>
+<option value="08:00:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],9,8) =='08:00:00') { echo "selected"; } ?> >08:00 am </option>
+<option value="08:30:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],9,8) =='08:30:00') { echo "selected"; } ?> >08:30 am </option>
+<option value="09:00:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],9,8) =='09:00:00') { echo "selected"; } ?> >09:00 am </option>
+<option value="09:30:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],9,8) =='09:30:00') { echo "selected"; } ?> >09:30 am </option>
+<option value="10:00:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],9,8) =='10:00:00') { echo "selected"; } ?> >10:00 am </option>
+<option value="10:30:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],9,8) =='10:30:00') { echo "selected"; } ?> >10:30 am </option>
+<option value="11:00:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],9,8) =='11:00:00 ') { echo "selected"; } ?> >11:00 am </option>
+<option value="11:30:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],9,8) =='11:30:00') { echo "selected"; } ?> >11:30 am </option>
+<option value="12:00:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],9,8) =='12:00:00') { echo "selected"; } ?> >12:00 pm </option>
+<option value="12:30:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],9,8) =='12:30:00') { echo "selected"; } ?> >12:30 pm </option>
+<option value="13:00:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],9,8) =='13:00:00') { echo "selected"; } ?> >01:00 pm </option>
+<option value="13:30:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],9,8) =='13:30:00') { echo "selected"; } ?> >01:30 pm </option>
+<option value="14:00:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],9,8) =='14:00:00') { echo "selected"; } ?> >02:00 pm </option>
+<option value="14:30:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],9,8) =='14:30:00') { echo "selected"; } ?> >02:30 pm </option>
+<option value="15:00:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],9,8) =='15:00:00') { echo "selected"; } ?> >03:00 pm </option>
+<option value="15:30:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],9,8) =='15:30:00') { echo "selected"; } ?> >03:30 pm </option>
+<option value="16:00:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],9,8) =='16:00:00') { echo "selected"; } ?> >04:00 pm </option>
+<option value="16:30:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],9,8) =='16:30:00') { echo "selected"; } ?> >04:30 pm </option>
+<option value="17:00:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],9,8) =='17:00:00') { echo "selected"; } ?> >05:00 pm </option>
+<option value="17:30:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],9,8) =='17:30:00') { echo "selected"; } ?> >05:30 pm </option>
+<option value="18:00:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],9,8) =='18:00:00') { echo "selected"; } ?> >06:00 pm </option>
+<option value="18:30:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],9,8) =='18:30:00') { echo "selected"; } ?> >06:30 pm </option>
+<option value="19:00:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],9,8) =='19:00:00') { echo "selected"; } ?> >07:00 pm </option>
+<option value="19:30:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],9,8) =='19:30:00') { echo "selected"; } ?> >07:30 pm </option>
+<option value="20:00:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],9,8) =='20:00:00') { echo "selected"; } ?> >08:00 pm </option>
+<option value="20:30:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],9,8) =='20:30:00 ') { echo "selected"; } ?> >08:30 pm </option>
+<option value="21:00:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],9,8) =='21:00:00') { echo "selected"; } ?> >09:00 pm </option>
+<option value="21:30:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],9,8) =='21:30:00') { echo "selected"; } ?> >09:30 pm </option>
+<option value="22:00:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],9,8) =='22:00:00') { echo "selected"; } ?> >10:00 pm </option>
+<option value="22:30:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],9,8) =='22:30:00') { echo "selected"; } ?> >10:30 pm </option>
+<option value="23:00:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],9,8) =='23:00:00') { echo "selected"; } ?> >11:00 pm </option>
+<option value="23:30:00" <?php if(isset($startime[$vardhbb]) && !empty($startime[$vardhbb]) && substr($startime[$vardhbb],9,8) =='23:30:00') { echo "selected"; } ?> >11:30 pm </option>
+                                                            </select>
+                                                    
+                                                    <!------------------------------------My start_time end here------------------------------>
+                                                    </li>
+                                                    <li style="width: 28%;">
+                                                       <select class="end_time1 required form-control" name="end_time[<?php echo $vardhbb; ?>]" placeholder="End Time" style="width: 42%;">
+                                                           <option value="24:00:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],0,8) =='24:00:00') { echo "selected"; } ?>>12:00 am </option>
+<option value="00:30:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],0,8) =='00:30:00') { echo "selected"; } ?> >12:30 am </option>
+<option value="01:00:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],0,8) =='01:00:00') { echo "selected"; } ?> >01:00 am </option>
+<option value="01:30:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],0,8) =='01:30:00') { echo "selected"; } ?> >01:30 am </option>
+<option value="02:00:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],0,8) =='02:00:00') { echo "selected"; } ?> >02:00 am </option>
+<option value="02:30:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],0,8) =='02:30:00') { echo "selected"; } ?> >02:30 am </option>
+<option value="03:00:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],0,8) =='03:00:00') { echo "selected"; } ?> >03:00 am </option>
+<option value="03:30:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],0,8) =='03:30:00') { echo "selected"; } ?> >03:30 am </option>
+<option value="04:00:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],0,8) =='04:00:00') { echo "selected"; } ?> >04:00 am </option>
+<option value="04:30:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],0,8) =='04:30:00') { echo "selected"; } ?> >04:30 am </option>
+<option value="05:00:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],0,8) =='05:00:00') { echo "selected"; } ?> >05:00 am </option>
+<option value="05:30:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],0,8) =='05:30:00 ') { echo "selected"; } ?> >05:30 am </option>
+<option value="06:00:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],0,8) =='06:00:00') { echo "selected"; } ?> >06:00 am </option>
+<option value="06:30:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],0,8) =='06:30:00') { echo "selected"; } ?> >06:30 am </option>
+<option value="07:00:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],0,8) =='07:00:00') { echo "selected"; } ?> >07:00 am </option>
+<option value="07:30:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],0,8) =='07:30:00') { echo "selected"; } ?> >07:30 am </option>
+<option value="08:00:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],0,8) =='08:00:00') { echo "selected"; } ?> >08:00 am </option>
+<option value="08:30:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],0,8) =='08:30:00') { echo "selected"; } ?> >08:30 am </option>
+<option value="09:00:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],0,8) =='09:00:00') { echo "selected"; } ?> >09:00 am </option>
+<option value="09:30:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],0,8) =='09:30:00') { echo "selected"; } ?> >09:30 am </option>
+<option value="10:00:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],0,8) =='10:00:00') { echo "selected"; } ?> >10:00 am </option>
+<option value="10:30:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],0,8) =='10:30:00') { echo "selected"; } ?> >10:30 am </option>
+<option value="11:00:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],0,8) =='11:00:00 ') { echo "selected"; } ?> >11:00 am </option>
+<option value="11:30:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],0,8) =='11:30:00') { echo "selected"; } ?> >11:30 am </option>
+<option value="12:00:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],0,8) =='12:00:00') { echo "selected"; } ?> >12:00 pm </option>
+<option value="12:30:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],0,8) =='12:30:00') { echo "selected"; } ?> >12:30 pm </option>
+<option value="13:00:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],0,8) =='13:00:00') { echo "selected"; } ?> >01:00 pm </option>
+<option value="13:30:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],0,8) =='13:30:00') { echo "selected"; } ?> >01:30 pm </option>
+<option value="14:00:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],0,8) =='14:00:00') { echo "selected"; } ?> >02:00 pm </option>
+<option value="14:30:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],0,8) =='14:30:00') { echo "selected"; } ?> >02:30 pm </option>
+<option value="15:00:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],0,8) =='15:00:00') { echo "selected"; } ?> >03:00 pm </option>
+<option value="15:30:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],0,8) =='15:30:00') { echo "selected"; } ?> >03:30 pm </option>
+<option value="16:00:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],0,8) =='16:00:00') { echo "selected"; } ?> >04:00 pm </option>
+<option value="16:30:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],0,8) =='16:30:00') { echo "selected"; } ?> >04:30 pm </option>
+<option value="17:00:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],0,8) =='17:00:00') { echo "selected"; } ?> >05:00 pm </option>
+<option value="17:30:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],0,8) =='17:30:00') { echo "selected"; } ?> >05:30 pm </option>
+<option value="18:00:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],0,8) =='18:00:00') { echo "selected"; } ?> >06:00 pm </option>
+<option value="18:30:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],0,8) =='18:30:00') { echo "selected"; } ?> >06:30 pm </option>
+<option value="19:00:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],0,8) =='19:00:00') { echo "selected"; } ?> >07:00 pm </option>
+<option value="19:30:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],0,8) =='19:30:00') { echo "selected"; } ?> >07:30 pm </option>
+<option value="20:00:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],0,8) =='20:00:00') { echo "selected"; } ?> >08:00 pm </option>
+<option value="20:30:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],0,8) =='20:30:00 ') { echo "selected"; } ?> >08:30 pm </option>
+<option value="21:00:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],0,8) =='21:00:00') { echo "selected"; } ?> >09:00 pm </option>
+<option value="21:30:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],0,8) =='21:30:00') { echo "selected"; } ?> >09:30 pm </option>
+<option value="22:00:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],0,8) =='22:00:00') { echo "selected"; } ?> >10:00 pm </option>
+<option value="22:30:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],0,8) =='22:30:00') { echo "selected"; } ?> >10:30 pm </option>
+<option value="23:00:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],0,8) =='23:00:00') { echo "selected"; } ?> >11:00 pm </option>
+<option value="23:30:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],0,8) =='23:30:00') { echo "selected"; } ?> >11:30 pm </option> 
+                                                            </select>
+                                               <!--         <?php echo Form::text('end_time['.$vardhbb.']', (isset($endtime[$vardhbb])&& $endtime[$vardhbb])?$endtime[$vardhbb]:"", array('class' => 'end_time required form-control','placeholder'=>"End Time")); ?>
+
+                                                    -->
+                                                    <!------------------------------------My end_time_end end here------------------------------>
+                                                    <select class="end_time1 required form-control" name="end_time_end[<?php echo $vardhbb; ?>]" placeholder="End Time" style="width: 42%;">
+                                                            <option value="24:00:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],9,8) =='24:00:00') { echo "selected"; } ?>>12:00 am </option>
+<option value="00:30:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],9,8) =='00:30:00') { echo "selected"; } ?> >12:30 am </option>
+<option value="01:00:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],9,8) =='01:00:00') { echo "selected"; } ?> >01:00 am </option>
+<option value="01:30:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],9,8) =='01:30:00') { echo "selected"; } ?> >01:30 am </option>
+<option value="02:00:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],9,8) =='02:00:00') { echo "selected"; } ?> >02:00 am </option>
+<option value="02:30:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],9,8) =='02:30:00') { echo "selected"; } ?> >02:30 am </option>
+<option value="03:00:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],9,8) =='03:00:00') { echo "selected"; } ?> >03:00 am </option>
+<option value="03:30:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],9,8) =='03:30:00') { echo "selected"; } ?> >03:30 am </option>
+<option value="04:00:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],9,8) =='04:00:00') { echo "selected"; } ?> >04:00 am </option>
+<option value="04:30:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],9,8) =='04:30:00') { echo "selected"; } ?> >04:30 am </option>
+<option value="05:00:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],9,8) =='05:00:00') { echo "selected"; } ?> >05:00 am </option>
+<option value="05:30:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],9,8) =='05:30:00 ') { echo "selected"; } ?> >05:30 am </option>
+<option value="06:00:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],9,8) =='06:00:00') { echo "selected"; } ?> >06:00 am </option>
+<option value="06:30:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],9,8) =='06:30:00') { echo "selected"; } ?> >06:30 am </option>
+<option value="07:00:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],9,8) =='07:00:00') { echo "selected"; } ?> >07:00 am </option>
+<option value="07:30:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],9,8) =='07:30:00') { echo "selected"; } ?> >07:30 am </option>
+<option value="08:00:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],9,8) =='08:00:00') { echo "selected"; } ?> >08:00 am </option>
+<option value="08:30:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],9,8) =='08:30:00') { echo "selected"; } ?> >08:30 am </option>
+<option value="09:00:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],9,8) =='09:00:00') { echo "selected"; } ?> >09:00 am </option>
+<option value="09:30:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],9,8) =='09:30:00') { echo "selected"; } ?> >09:30 am </option>
+<option value="10:00:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],9,8) =='10:00:00') { echo "selected"; } ?> >10:00 am </option>
+<option value="10:30:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],9,8) =='10:30:00') { echo "selected"; } ?> >10:30 am </option>
+<option value="11:00:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],9,8) =='11:00:00 ') { echo "selected"; } ?> >11:00 am </option>
+<option value="11:30:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],9,8) =='11:30:00') { echo "selected"; } ?> >11:30 am </option>
+<option value="12:00:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],9,8) =='12:00:00') { echo "selected"; } ?> >12:00 pm </option>
+<option value="12:30:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],9,8) =='12:30:00') { echo "selected"; } ?> >12:30 pm </option>
+<option value="13:00:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],9,8) =='13:00:00') { echo "selected"; } ?> >01:00 pm </option>
+<option value="13:30:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],9,8) =='13:30:00') { echo "selected"; } ?> >01:30 pm </option>
+<option value="14:00:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],9,8) =='14:00:00') { echo "selected"; } ?> >02:00 pm </option>
+<option value="14:30:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],9,8) =='14:30:00') { echo "selected"; } ?> >02:30 pm </option>
+<option value="15:00:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],9,8) =='15:00:00') { echo "selected"; } ?> >03:00 pm </option>
+<option value="15:30:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],9,8) =='15:30:00') { echo "selected"; } ?> >03:30 pm </option>
+<option value="16:00:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],9,8) =='16:00:00') { echo "selected"; } ?> >04:00 pm </option>
+<option value="16:30:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],9,8) =='16:30:00') { echo "selected"; } ?> >04:30 pm </option>
+<option value="17:00:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],9,8) =='17:00:00') { echo "selected"; } ?> >05:00 pm </option>
+<option value="17:30:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],9,8) =='17:30:00') { echo "selected"; } ?> >05:30 pm </option>
+<option value="18:00:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],9,8) =='18:00:00') { echo "selected"; } ?> >06:00 pm </option>
+<option value="18:30:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],9,8) =='18:30:00') { echo "selected"; } ?> >06:30 pm </option>
+<option value="19:00:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],9,8) =='19:00:00') { echo "selected"; } ?> >07:00 pm </option>
+<option value="19:30:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],9,8) =='19:30:00') { echo "selected"; } ?> >07:30 pm </option>
+<option value="20:00:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],9,8) =='20:00:00') { echo "selected"; } ?> >08:00 pm </option>
+<option value="20:30:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],9,8) =='20:30:00 ') { echo "selected"; } ?> >08:30 pm </option>
+<option value="21:00:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],9,8) =='21:00:00') { echo "selected"; } ?> >09:00 pm </option>
+<option value="21:30:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],9,8) =='21:30:00') { echo "selected"; } ?> >09:30 pm </option>
+<option value="22:00:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],9,8) =='22:00:00') { echo "selected"; } ?> >10:00 pm </option>
+<option value="22:30:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],9,8) =='22:30:00') { echo "selected"; } ?> >10:30 pm </option>
+<option value="23:00:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],9,8) =='23:00:00') { echo "selected"; } ?> >11:00 pm </option>
+<option value="23:30:00" <?php if(isset($endtime[$vardhbb]) && !empty($endtime[$vardhbb]) && substr($endtime[$vardhbb],9,8) =='23:30:00') { echo "selected"; } ?> >11:30 pm </option> 
+                                                            </select>
+                                                    
+                                                    <!------------------------------------My end_time_end end here------------------------------>
+                                                    
+                                                    </li>
+                                                </ul>
+                                            <?php } 
+                                            
+                                           // echo "<pre>";
+                                            //print_r($breakfast_time);
+                                           // echo "------------breakfast time--------";
+                                            //print_r($breakfast);
+                                            
+                                            
+                                            //print_r($startime);
+                                           // echo "------------start time--------";
+                                           // print_r($vrrcy);
+                                            
+                                            //print_r($endtime);
+                                           // echo "------------end time--------";
+                                            
+                                          //  print_r($endty);
+                                            
+                                            ?>
+
+                                        </div>
+                                    </div> 
+                                    <div class="labeles">
+                                        Minimum Order (<?php echo CURR; ?>) <span class="red-mark"> *</span>
+                                    </div>
+
+                                    <div class="detail" > 
+                                        <?php echo Form::text('minimum_order', Input::old('minimum_order'), array('class' => 'required positiveNumber form-control','placeholder'=>"Minimum Order")); ?>
+
+                                    </div> 
+                                    <div class="labeles">
+                                        Estimated Cost for two people (<?php echo CURR; ?>) <span class="red-mark"> *</span>
+                                    </div>
+
+                                    <div class="detail" > 
+                                        <?php echo Form::text('estimated_cost', Input::old('estimated_cost'), array('class' => 'required positiveNumber form-control','placeholder'=>"Estimated Cost for two")); ?>
+
+                                    </div> 
+                                    <div class="labeles">
+                                        Average Delivery Time (Minutes)<span class="red-mark"> *</span>
+                                    </div>
+                                    <div class="detail" > 
+                                        <?php echo Form::text('average_time', Input::old('average_time'), array('class' => 'required form-control number','placeholder'=>"Average Delivery Time")); ?>
+
+                                    </div> 
+
+                                    <div class="labeles">
+                                        Meal type <span class="red-mark"> *</span>
+                                    </div>
+                                    <?php
+                                    $mealtype_array = array(
+                                        '' => 'Please Select'
+                                    );
+
+                                    $mealtype = Mealtype::orderBy('name', 'asc')->where('status', "1")->lists('name', 'id');
+                                    if (!empty($mealtype)) {
+                                        foreach ($mealtype as $key => $val)
+                                            $mealtype[$key] = ucfirst($val);
+                                    }
+
+//                                    global $mealtype;
+//                                    $array = array(
+//                                        'Meals' => 'Meals',
+//                                        'Event' => 'Event',
+//                                        'Fast Homemade Food' => 'Fast Homemade Food',
+//                                    );
+                                    $old = Input::old('catering_type') ? Input::old('catering_type') : explode(",", @$opening_hours->catering_type);
+//                                    $old = explode(",", $old);
+                                    ?>
+                                    <div class="detail" > 
+                                        <?php echo Form::select('catering_type[]',$mealtype, $old, array('class' => 'required form-control','multiple'=>'multiple' ,'onchange'=>"chkselect(this.value);",'id'=>"selectop")); ?>
+
+                                    </div> 
+
+                                </div>
+                            </div>
+
+                            <div class="form_group">
+                                <div class="in_upt in_upt_res center-element">
+                                    <?php echo Form::submit('Submit', array('class' => "btn btn-primary")); ?>
+
+                                    <?php echo html_entity_decode(HTML::link(HTTP_PATH.'user/myaccount', "Cancel", array('class' => 'btn btn-default'), true)); ?>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<?php echo HTML::script('public/js/chosen/chosen.jquery.js');; ?>
+
+<script type="text/javascript"> 
+    Array.prototype.diff = function (a) {
+        return this.filter(function (i) {
+            return a.indexOf(i) === -1;
+        });
+    };
+
+    $('body').on('change','.chzn-select',function(e){
+        
+        var opendays = $(this).val();
+        //    alert(opendays);
+        var alwaysdays = new Array('mon', 'tue', 'wed', 'thu', 'fri' , 'sat', 'sun');
+       
+        for(var i = 0;i<= 6;i++){
+            if(opendays.indexOf(alwaysdays[i]) == -1){
+                $('#'+alwaysdays[i]+'_div').hide();
+            }else{
+                $('#'+alwaysdays[i]+'_div').show();
+            }
+        }
+       
+    });
+    
+    $(".chzn-select").chosen();
+    $(".chzn-select-deselect").chosen({allow_single_deselect: true});
+    $("#selectop").chosen({allow_single_deselect: true});
+//    $("#selectop").chosen({disable: true});
+    
+    
+    function valueChanged(value){
+        if(value == 0){
+            //$('.menu_tablesefgt input').attr('readonly', 'readonly');
+            $('.menu_tablesefgt input').attr('disabled', 'disabled');
+            $('.menu_tablesefgt select').attr('disabled', 'disabled');
+            $('.chzn-select').attr('disabled', 'disabled');
+            $('.chzn-container').addClass('dcbl_dv');
+            $('.chzn-select').prop('disabled', true).trigger("liszt:updated");
+            $('.hint-onoff_highlight').show();
+        }else{
+            $('.menu_tablesefgt input').removeAttr('disabled', 'disabled');
+             $('.menu_tablesefgt select').removeAttr('disabled', 'disabled');
+            $('.chzn-select').removeAttr('disabled', 'disabled');
+            $('.chzn-container').removeClass('dcbl_dv');
+            $('.chzn-select').prop('disabled', false).trigger("liszt:updated");
+            $('.hint-onoff_highlight').hide();
+
+        }
+    }
+</script>
+
+
+<?php if (@$opening_hours->open_close == 0) {
+    ?>
+    <script type="text/javascript">
+   
+    
+        $(document).ready(function () {
+            $('.menu_tablesefgt select').attr('disabled', 'disabled');
+            $('.menu_tablesefgt input').attr('disabled', 'disabled');
+            $('.chzn-select').attr('disabled', 'disabled');
+            $('.chzn-select').prop('disabled', true).trigger("liszt:updated");
+            $('.hint-onoff_highlight').show();
+
+        });
+    </script>
+    <?php }
+?>
+
+
+<?php $__env->stopSection(); ?>
+
+
+
+<?php echo $__env->make('layout', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>

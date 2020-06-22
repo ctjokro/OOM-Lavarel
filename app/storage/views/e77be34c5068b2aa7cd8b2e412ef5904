@@ -1,0 +1,179 @@
+<?php $__env->startSection('content'); ?>
+
+<section>
+    <div class="top_menus">
+        
+        
+        <div class="dash_toppart">
+         <div class="wrapper"> 
+        <div class="_cttv">
+                 <?php echo $__env->make('elements/left_menu', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
+                 
+                 
+        </div></div></div>
+        <div class="wrapper">
+           
+            <div class="acc_bar acc_bar_new">
+                <?php echo $__env->make('elements/oderc_menu', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
+                
+                
+                <div class="informetion informetion_new">
+                    
+                    <?php echo View::make('elements.actionMessage')->render(); ?>
+
+                    <div class="informetion_top">
+                         <div class="tatils">Received Orders</div>
+                        <div class="informetion_bx">
+                            <section class="panel serchh">
+                    
+                    <div class="search_pane">
+                        <?php echo View::make('elements.actionMessage')->render(); ?>
+
+                        <?php echo Form::open(array('url' => '/order/receivedorders', 'method' => 'post', 'id' => 'adminAdd', 'files' => true,'class'=>'form-inline')); ?>
+
+                        <div class="search_wrap">
+                            <div class="wdew">
+                        <div class="form-group align_box">
+                            <label class="sr-only" for="search">Your Keyword</label>
+                            <?php echo Form::text('search', $search_keyword, array('class' => 'required search_fields form-control','placeholder'=>"Your Keyword")); ?>
+
+                        </div>
+                               
+                        <div class="form-group align_box">
+                           <?php
+                                    $statusArray = array(
+                                        '' => 'Please Select'
+                                    );
+                                    //$statusArray['Pending'] = 'Pending';
+                                    $statusArray['Paid'] = 'Paid';
+                                    global $adminStatus;
+                                    if (!empty($adminStatus)) {
+                                        foreach ($adminStatus as $key => $val)
+                                            $statusArray[$key] = $val;
+                                    }
+                                    ?>
+                                    <?php echo Form::select('status', $statusArray, $orderstatus, array('class' => 'form-control search_fields required', 'id'=>'status')); ?>
+
+                                    <span class="subb"><?php echo Form::submit('Search', array('class' => "btn btn-primary")); ?>  </span>
+                        </div>
+                       </div>
+                        <span class="hint" style="margin:5px 0">Search Order by typing their Order number</span>
+                       </div>
+                        <?php echo Form::close(); ?>
+
+                    </div>
+                </section>
+                            <div class="informetion_bxes">
+                                <?php
+                                if (!$records->isEmpty()) {
+                                    ?>
+                                    <div class="table_dcf">
+                                        <div class="tr_tables">
+                                            <div class="td_tables">Order Number</div>
+                                            <div class="td_tables">Status</div>
+                                            <div class="td_tables">Placed Date/Time</div>
+                                            <div class="td_tables">Order Type</div>
+                                            <div class="td_tables">Action</div>
+                                        </div>
+                                        <?php
+                                        $i = 1;
+                                        foreach ($records as $data) {
+                                            if ($i % 2 == 0) {
+                                                $class = 'colr1';
+                                            } else {
+                                                $class = '';
+                                            }
+                                            ?>
+                                            <div class="tr_tables2">
+                                                <div data-title="Address Title" class="td_tables2">
+                                                    <?php echo $data->order_number; ?>
+
+                                                </div>
+                                                <div data-title="Address Title" class="td_tables2">
+                                                    <?php echo ucwords($data->status);; ?>
+
+                                                </div>
+                                                <div data-title="Created" class="td_tables2">
+                                                    <?php echo date("d M Y h:i A", strtotime($data->created)); ?>
+
+                                                </div>
+                                                <div data-title="Created" class="td_tables2">
+                                                   <?php 
+                                                  // print_r($data); exit;
+                                                   if($data->pickup_ready == 1){
+                                                       echo "Pick up";
+                                                   }else{
+                                                       echo "Home Deliver";
+                                                   }
+                                                   ?>
+                                                </div>
+                                                <div data-title="Action" class="td_tables2">
+                                                    <div class="actions">
+                                                        <?php
+                                                        echo html_entity_decode(HTML::link('order/receivedview/' . $data->slug, '<i class="fa fa-search"></i>', array('class' => 'btn btn-primary btn-xs', 'title' => 'View Order Details')));
+                                                        ?>
+                                                    </div>
+                                                </div>	
+                                            </div>
+                                            <?php
+                                            $i++;
+                                        }
+                                        ?>
+                                    <?php } else {
+                                        ?>
+                                        <div class="no-record">
+                                            No records available
+                                        </div>
+                                        <?php
+                                    }
+                                    ?>
+                                </div>
+
+                                <div class="dataTables_paginate paging_bootstrap pagination">
+                                    <?php echo $records->appends(Request::only('search','from_date','to_date'))->links(); ?>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+</section>
+<p id="audioA"></p>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script type="text/javascript"> 
+ 
+$(document).ready(function () { 
+   
+     setInterval(function(){ 
+         var aa= '<?php echo Session::get('user_id'); ?>'; 
+         // here
+         $.ajax({
+              url: '<?php echo url("/user/ordersound"); ?>',
+	          type: 'POST',
+	          dataType: "json",
+	          data: {'user':aa},
+            success: function(resultData) { 
+		    console.log(resultData);
+		    //console.log(resultData.count);
+		   if(resultData.count > 0){
+		   //   alert('yes'); 
+		     $('#audioA').html('<iframe style="display:none;" allow="autoplay" src="https://www.online-order.menu/dev/public/handBell.mp3"></iframe>');  
+		   }
+		  
+		},
+		error : function(error){
+           console.log(error);
+        }
+		
+		});
+        //$('#audioA').html('<iframe style="display:none;" allow="autoplay"  src="https://www.online-order.menu/dev/public/beepSound.mp3"></iframe>');
+       
+          
+     }, 5000);
+	  
+});
+</script>
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layout', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>

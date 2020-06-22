@@ -1,0 +1,467 @@
+
+@section('content')
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#city").change(function () {
+            $("#area").load("<?php echo HTTP_PATH . "customer/loadarea/" ?>" + $(this).val() + "/0");
+        })
+    });
+</script>
+<script src="{{ URL::asset('public/js/jquery.validate.js') }}"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#homepagesearch").validate({
+            submitHandler: function (form) {
+                this.checkForm();
+
+                if (this.valid()) { // checks form for validity
+                    //                    $('#formloader').show();
+                    this.submit();
+                } else {
+                    return false;
+                }
+            }
+        });
+
+    });
+</script>    
+
+
+<section class="hero_area">
+    <div class="hero_content"> 
+        <div id="homepagebanner" class="carousel slide" data-ride="carousel">
+            <!-- Indicators -->
+            <?php
+            $banners = DB::table('banner')
+                    ->select(DB::raw("*"))
+                    ->where('status', '1')
+                    ->get();
+//                         dd($banners); exit;
+            if ($banners) {
+                $i = 1;
+                $j = 0;
+                $classV = "";
+                ?>
+                <ol class="carousel-indicators">
+                    <?php
+                    foreach ($banners as $bannersval) {
+                        if ($j == 0) {
+                            $classV = "active";
+                        } else {
+                            $classV = "";
+                        }
+                        ?>
+                        <li data-target="#homepagebanner" data-slide-to="<?php echo $j ?>" class="<?php echo $classV; ?>"></li>
+
+                        <?php $j++;
+                    }
+                    ?>
+                </ol>
+
+                <!-- Wrapper for slides -->
+                <div class="carousel-inner">
+                    <?php
+                    foreach ($banners as $bannersval) {
+                        if (file_exists(UPLOAD_BANNER_IMAGE_PATH . $bannersval->file_name) && $bannersval->file_name != "") {
+                            if ($i == 1) {
+                                $classV = "active";
+                            } else {
+                                $classV = "";
+                            }
+                            ?>
+                            <div class="item <?php echo $classV; ?>">
+                                {{HTML::image(DISPLAY_BANNER_IMAGE_PATH . $bannersval->file_name, '')}}
+                                <div class="wrapper">
+                                    <div class="_ctyt"><div class="text_slider">{{$bannersval->title}}</div></div>
+
+                                </div>
+                            </div>    
+                            <?php
+                            $i++;
+                        }
+                    }
+                    ?>
+
+                </div>
+
+                <!-- Left and right controls -->
+
+
+<?php } ?>
+
+            <div class="banner_aside_left">
+                <div class="container">
+                    <div class="form_box_top"></div>
+                    <div class="clear"></div>
+                    {{ Form::open(array('url' => '/restaurants/list', 'method' => 'get','class'=>"form","id"=>'homepagesearch')) }}
+                    <div class="form_box_bottom">
+                        <div class="select_a_bg">
+                            <div class="select_a_bg_top"></div>
+                            <div class="select_a_bg_bottom">
+                                <h1>Find Restaurants</h1>
+                                <div class="clear"></div>
+
+                            </div>
+                        </div>
+                        <div class="field_wrap">
+
+                            <div class="three_row">
+
+
+                                <?php
+                                $cities_array = array(
+                                    '' => "City"
+                                );
+                                // $cities_array = array();
+                                // get Cairo city id
+                                $city_id = City::where('name', "like", "%Cairo%")->lists('id');
+                                $city_id = isset($city_id[0]) ? $city_id[0] : "";
+
+                                $cities = City::where('status', "=", "1")->orderBy('name', 'asc')->lists('name', 'id');
+                                if (!empty($cities)) {
+                                    foreach ($cities as $key => $val)
+                                        $cities_array[$key] = ucfirst($val);
+                                }
+                                ?>
+                                {{ Form::select('city', $cities_array, null, array('class' => 'select_box required', 'id'=>'city')) }}
+
+                            </div>
+                            <div class="clear"></div>
+                            <div class="three_row">
+                                <?php
+                                $area_array = array(
+                                    '' => "Area"
+                                );
+                                $area = Area::orderBy('name', 'asc')->where('status', "=", "1")->where('city_id', "=", $city_id)->lists('name', 'id');
+                                if (!empty($area)) {
+                                    foreach ($area as $key => $val)
+                                        $area_array[$key] = ucfirst($val);
+                                }
+                                ?>
+                                {{ Form::select('area', $area_array, Input::old('area'), array('class' => 'select_box select_margin selectborder_light', 'id'=>'area')) }}
+                                <div class="clear"></div>
+                                <?php
+                                $array = array(
+                                    '' => "Cuisine"
+                                );
+                                if (!empty($cuisines)) {
+                                    foreach ($cuisines as $key => $val)
+                                        $array[$key] = ucfirst($val);
+                                }
+                                ?></div>
+                            <div class="three_row">
+                                {{ Form::select('cuisine[]', $array, null, array('id'=>'standard', 'class'=>'custom-select select_box select_margin selectborder_light')) }}
+                                <script type = "text/javascript">
+                                    $(function () {
+                                        $("#standard").customselect();
+                                    });
+                                </script></div>
+
+                            <div class="clear"></div>
+                            <div class="submit_btnn submit_btnn_slid"> 
+                                <input type="submit"  value="Go" class="btn btn-primary" /></div></div>
+                    </div>
+                    {{ Form::close() }}
+                </div>
+            </div>
+        </div>
+
+
+
+
+    </div>
+</section>
+<section class="services">
+    <h2 class="section-title">How It Works</h2>
+    <p class="desc">Get your Delicious food in 4 simple steps.</p>
+    <div class="container center_row">
+        <div class="row">
+            <div class="col-md-3 col-sm-6 col-xs-12">
+                <div class="media">
+                    <div class="media-left media-middle">
+                        <img src="{{ URL::asset('public/img/front') }}/map-location.png" alt="img" />
+                    </div>
+                    <div class="media-body">
+                        <h4 class="media-heading">Select</h4>
+                        <p>Choose your area<br /> and desirable<br /> dish/Restaurant name</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 col-xs-12">
+                <div class="media">
+                    <div class="media-left media-middle">
+                        <img src="{{ URL::asset('public/img/front') }}/dish.png" alt="img" />
+                    </div>
+                    <div class="media-body">
+                        <h4 class="media-heading">Choose</h4>
+                        <p>Browse your<br /> desired dish or restaurant<br /> And add it to the cart.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 col-xs-12">
+                <div class="media">
+                    <div class="media-left media-middle">
+                        <img src="{{ URL::asset('public/img/front') }}/paypal.png" alt="img" />
+                    </div>
+                    <div class="media-body">
+                        <h4 class="media-heading">Pay</h4>
+                        <p>Pay safely and faster with <b>Paypal or Bank Transfer!</b></p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 col-xs-12">
+                <div class="media">
+                    <div class="media-left media-middle">
+                        <img src="{{ URL::asset('public/img/front') }}/fast-food.png" alt="img" />
+                    </div>
+                    <div class="media-body">
+                        <h4 class="media-heading">Enjoy</h4>
+                        <p>Food<br /> delivered at your door</p>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</section>
+<section class="home-area">
+    <div class="home_content">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-12"><center>
+                        <div class="title_cover">
+                            <h1 class="shadow_txet">Top Restaurants</h1>
+                            <p class="desc">Order food now from 30 + Restaurants </p></div>
+
+                        <div class="clear"></div>
+                    </center> </div>
+                <div class="home_list">
+                    <ul>
+                        <?php
+                        if (!empty($record)) {
+                            ?><?php
+                            foreach ($record as $data) {
+                                ?>
+        <?php //echo '<pre>';$data->unique_name?$data->unique_name:$data->slug; ?>
+                                <li class="col-md-3 col-sm-4 col-xs-12 ">
+                                    <div class="top_dishes_wrap "> 
+                                        <div class="thumbnail">
+                                            <div class="top_dishes">
+                                                <?php
+                                                if ($data->unique_name) {
+                                                    $subdomainVal = $data->unique_name;
+                                                } else {
+                                                    $subdomainVal = $data->slug;
+                                                }
+                                                ?>
+                                                <?php
+                                                if ($data->featured == 1) {
+                                                    //  echo date('Y-m-d h:ia',strtotime($data->expiry_date));
+                                                    if (strtotime($data->expiry_date) >= time()) {
+                                                        echo "<span class='featured'>Featured</span>";
+                                                    } else {
+
+                                                        $user_id = $data->id;
+                                                        //echo $user_id;
+                                                        DB::table('users')
+                                                                ->where('id', $user_id)
+                                                                ->update(array('featured' => 0));
+                                                    }
+                                                }
+                                                
+                                                if (file_exists(DISPLAY_FULL_PROFILE_IMAGE_PATH . $data->profile_image) and $data->profile_image) {
+                                                    ?>
+                                                    <a href="{{'http://'.$subdomainVal.'.'.SERVER_PATH.'welcome'}}"><img src="{{ URL::asset('public/assets/timthumb.php?src='.HTTP_PATH.DISPLAY_FULL_PROFILE_IMAGE_PATH.$data->profile_image.'&w=260&h=160&zc=1&q=100') }}" alt="img" /></a>
+                                                    <!--<a href="{{HTTP_PATH.'restaurants/menu/'.$data->slug}}"><img src="{{ URL::asset('public/assets/timthumb.php?src='.HTTP_PATH.DISPLAY_FULL_PROFILE_IMAGE_PATH.$data->profile_image.'&w=260&h=160&zc=1&q=100') }}" alt="img" /></a>-->
+                                                    <?php
+                                                } else {
+                                                    ?>
+                                                    <!--<a href="{{HTTP_PATH.'restaurants/menu/'.$data->slug}}"> <img src="{{ URL::asset('public/assets/timthumb.php?src='.HTTP_PATH.'public/img/front/default_restro.png&w=160&h=160&zc=1&q=100') }}" alt="img" /></a>-->
+                                                    <a href="{{'http://'.$subdomainVal.'.'.SERVER_PATH.'welcome'}}"> <img src="{{ URL::asset('public/assets/timthumb.php?src='.HTTP_PATH.'public/img/front/default_restro.png&w=160&h=160&zc=1&q=100') }}" alt="img" /></a>
+                                                    <?php
+                                                }
+                                                //print_r($data);
+                                                ?><div class="ekdiv">
+                                                    <div class="open_img open_img_new">
+                                                        <?php
+                                                        // get carters open/close status
+                                                        if ($data->open_close) {
+
+                                                            $day = date('D');
+                                                            $open_days = explode(",", $data->open_days);
+
+                                                            $vrrcy = explode(',', $data->start_time);
+                                                            $endty = explode(',', $data->end_time);
+
+
+                                                            $startime = array_combine($open_days, $vrrcy);
+                                                            $endtime = array_combine($open_days, $endty);
+                                                            $start = "";
+                                                            if (isset($startime[strtolower(date('D'))])) {
+
+                                                                $start = $startime[strtolower(date('D'))];
+                                                            }
+                                                            //dd($endtime);
+                                                            if (isset($endtime[strtolower(date('D'))])) {
+                                                                $end = $endtime[strtolower(date('D'))];
+                                                            }
+                                                            
+                                                            if(isset($end) and $end < $start){
+                                                                $end = date('Y-m-d h:i',strtotime(date('Y-m-d '.$end) . ' +1 day'));
+                                                                
+                                                            }
+
+
+                                                            if ((isset($start) && strtotime($start) <= time()) && (isset($end) && time() <= strtotime($end)) and in_array(strtolower(date('D')), $open_days)) {
+                                                                ?>
+                                                                <!--<span class="open same_style">open</span>-->
+                                                                <?php
+                                                            } else {
+                                                                ?>
+                                                                <!--<span class="closee same_style">closed</span>-->
+                                                                <?php
+                                                            }
+                                                        } else {
+                                                            ?>
+                                                            <!--<span class="closee same_style">closed</span>-->
+                                                            <?php
+                                                        }
+                                                        ?>
+                                                    </div>
+                                                </div> 
+
+                                            </div>
+                                            <div class="caption"> 
+                                                <!--<h3><a href="{{HTTP_PATH.'restaurants/menu/'.$data->slug}}">{{$data->first_name}}</a></h3>-->
+                                                <?php
+                                                if ($data->unique_name) {
+                                                    $subdomainVal = $data->unique_name;
+                                                } else {
+                                                    $subdomainVal = $data->slug;
+                                                }
+                                                ?>
+                                                <h3><a href="{{'http://'.$subdomainVal.'.'.SERVER_PATH.'welcome'}}">{{$data->first_name}}</a></h3>
+                                                <?php
+                                                // get all avg ratings
+                                                $ratings = DB::table('reviews')
+                                                        ->select(DB::raw("avg(quality) as quality"), DB::raw("avg(packaging) as packaging"), DB::raw("avg(delivery) as delivery"), DB::raw("count(id) as counter"))
+                                                        ->where('caterer_id', $data->id)
+                                                        ->where('status', '1')
+                                                        ->first();
+                                                ?>
+                                                <p class="rating_bx rating_bx_new sliderc"> <?php
+                                                    $avg_ratng = round(($ratings->quality + $ratings->packaging) / 2);
+                                                    for ($i = 0; $i < $avg_ratng; $i++) {
+                                                        echo '<span>' . HTML::image(HTTP_PATH . "public/lib/img/star-on.png", '') . '</span>';
+                                                    }
+                                                    for ($j = 5; $j > $avg_ratng; $j--) {
+                                                        echo '<span>' . HTML::image(HTTP_PATH . "public/lib/img/star-off.png", '') . '</span>';
+                                                    }
+                                                    ?></p>
+                                                <div class="uppef dsfdsf_dff">
+                                                    <?php
+                                                    $menu_itemNonveg = DB::table('menu_item')
+                                                            ->where('user_id', $data->id)
+                                                            ->where('non_veg', '1')
+                                                            ->first();
+                                                    $menu_itemveg = DB::table('menu_item')
+                                                            ->where('user_id', $data->id)
+                                                            ->where('non_veg', '0')
+                                                            ->first();
+                                                    if ($menu_itemNonveg) {
+                                                        ?><span class="new-veg-non" title="Non-veg">{{ HTML::image(URL::asset('public/img/front/non-veg-img.png'), '', array()) }}</span><?php
+                                                    }
+                                                    if ($menu_itemveg) {
+                                                        ?><span class="new-veg-non" title="Veg">{{ HTML::image(URL::asset('public/img/front/veg-img.png'), '', array()) }}</span><?php
+                                                    }
+                                                    ?>
+
+
+                                                </div>
+                                                <p class="content">
+                                                    <a href="{{'http://'.$subdomainVal.'.'.SERVER_PATH.'welcome'}}"> {{$data->address}}</a>
+                                                    <!--<a href="{{HTTP_PATH.'restaurants/menu/'.$data->slug}}">{{$data->address}}</a>-->
+                                                </p>
+                                                <p class="address_bok">{{($data->city_name).($data->area_name?", ".$data->area_name:"") }}</p>
+                                                <div class="center_button"> 
+                                                    <a href="{{'http://'.$subdomainVal.'.'.SERVER_PATH.'welcome'}}" class="btn btn-link" role="button">View Detail</a>
+                                                    <!--<a href="{{HTTP_PATH.'restaurants/menu/'.$data->slug}}" class="btn btn-link" role="button">View Detail</a>-->
+                                                </div>
+                                            </div>
+                                        </div>            </div>                            
+                                </li>
+    <?php } ?>
+<?php } ?>                                        
+                    </ul>
+
+                </div>
+
+                <div class="yrrrddd" ><a class="btn btn-primary" href="<?php echo HTTP_PATH . "restaurants/list" ?>">View All Restaurants</a></div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="wrapper ptop ta-center mbot2">
+    <div class="ui statistics grey-text small margin0" style="justify-content: center; -webkit-justify-content: center;">
+        <?php
+        $totalresults = DB::table('users')
+                ->select(DB::raw("count(id)as counter"))
+                ->where('status', '1')
+                ->where('user_type', 'Restaurant')
+                ->first();
+        $totalcousine = DB::table('cuisines')
+                ->select(DB::raw("count(id)as counter"))
+                ->where('status', '1')
+                ->first();
+        $totalorders = DB::table('orders')
+                ->select(DB::raw("count(id)as counter"))
+                ->first();
+
+        $totalamount = DB::table('order_item')
+                ->select(DB::raw("SUM(sub_total)as counter"))
+                ->first();
+// print_r($totalresults); exit;
+        ?>
+        <div class="statistic">
+            <div class="value"><?php echo App::make("UserController")->thousandsFormat($totalresults->counter); ?></div>
+            <div class="label">RESTAURANTS</div>
+        </div>
+        <div class="statistic">
+            <div class="value"><?php echo App::make("UserController")->thousandsFormat($totalcousine->counter); ?></div>
+            <div class="label">Cuisines</div>
+        </div>
+        <div class="statistic">
+            <div class="value"><?php echo App::make("UserController")->thousandsFormat(DB::table('orders')->count()); ?></div>
+            <div class="label">Orders</div>
+        </div>
+        <div class="statistic">
+            <div class="value"><?php echo App::make("UserController")->thousandsFormat(round($totalamount->counter)); ?></div>
+            <div class="label">total amount</div>
+        </div>
+
+    </div>
+</section>
+<section class="even-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-sm-6 col-md-6">
+                <div class="app-store-img">{{ HTML::image(URL::asset('public/img/front/app-img.png'), '', array()) }}</div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-6">
+                <div class="even-bx">
+                    <h2>Find your flavour even faster</h2>
+                    <p>For speedy ordering, get the free Menulog app on iOS or Android.</p>
+                    <div class="app-button">
+                        <a href="#">{{ HTML::image(URL::asset('public/img/front/android-img.png'), '', array()) }}</a>
+                        <a href="#">{{ HTML::image(URL::asset('public/img/front/google-play-img.png'), '', array()) }}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+@stop

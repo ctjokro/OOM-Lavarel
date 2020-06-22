@@ -1,0 +1,166 @@
+/*!
+ * jQuery Custom Select Plugin - Master Source
+ * 2014-09-03
+ *
+ * http://www.blissmedia.com.au/
+ *
+ * Copyright 2014 Bliss Media
+ * Released under the MIT license:
+ *   http://www.opensource.org/licenses/mit-license.php
+ */
+
+/* Standard
+----------------------------------*/
+select{cursor:pointer;}
+.custom-select {
+  position: relative;
+ 
+  border: 1px solid #888;
+  background: #fff;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+  
+  
+  
+  
+  float: left;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0 13px;
+    height: 57px;
+    border-radius: 6px;
+    border: solid 1px #bfbfbf;
+    border: solid 1px rgba(0, 0, 0, 0.3);
+    background: #fff url(../../img/front/select_box_icon.png) right center no-repeat;
+    box-shadow: inset 0px 2px 5px rgba(0, 0, 0, 0.2);
+    
+    font-size: 16px;
+    color: #6e6e6e;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    -o-appearance: none;
+    -ms-appearance: none;
+    appearance: none;
+	margin-top:12px;
+}
+.custom-select a {
+  display: inline-block;
+  width: 100%;
+  height: 40px;
+  padding: 19px 0px 0 4px;
+  color: #6e6e6e;
+  text-decoration: none;
+  cursor: pointer;
+}
+.custom-select a span {
+  display: inline-block;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.custom-select select {
+  display: none !important;
+}
+.custom-select > div {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin: 1px 0 0 -1px;
+  width: 100%;
+  border: 1px solid #888;
+  border-top: 0;
+  background: #FFFFFF;
+  z-index: 10;
+  overflow: hidden;
+}
+.custom-select input {
+     width: 91.2%;
+    border: 1px solid #cccccc;
+    margin: 5px 5px;
+    padding:0 5px;
+    font-size: 14px;
+	background:url(../../img/front/search_icon.png) left center no-repeat; border-radius:4px 0 0 4px; overflow:hidden; height:36px;    text-indent: 46px;
+}
+.custom-select > div > div {
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: visible;
+  margin: 5px;
+  max-height: 173px;
+}
+.custom-select div ul {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.custom-select div ul li {
+  display: none;
+  padding: 5px;
+}
+.custom-select div ul li:first-child{display:none !important;}
+.custom-select div ul li.active {
+  display: block;
+  cursor: pointer;
+}
+.custom-select div ul li:hover {
+  background: #444;
+  color: #fff;
+}
+.custom-select div ul li.option-hover {
+  background: #83BE5B;
+  color: #fff;
+}
+.custom-select div ul li.option-disabled {
+  color: #999;
+}
+.custom-select div ul li.option-disabled:hover {
+  background: #ff9999;
+  color: #fff;
+}
+.custom-select div ul li.option-hover.option-disabled {
+  background: #ff6666;
+  color: #fff;
+}
+.custom-select div ul li.no-results {
+  display: none;
+  background: #f2f2f2;
+  color: #000;
+}
+
+/* Custom Select - Open
+----------------------------------*/
+.custom-select-open {
+  border-bottom: 1px solid #eee;
+}
+.custom-select-open div {
+  display: block;
+  margin-top:-50px;
+}
+
+/* Hide Input Box
+----------------------------------*/
+.custom-select input.custom-select-hidden-input {
+  position: absolute !important;
+  top: 0 !important;
+  left: -1000px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  z-index: -1 !important;
+}
+
+/* Mobile Override
+----------------------------------*/
+.custom-select-mobile select {
+  display: inline !important;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}

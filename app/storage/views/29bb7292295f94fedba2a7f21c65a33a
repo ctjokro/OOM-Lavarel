@@ -1,0 +1,14 @@
+
+<?php $__env->startSection('content'); ?>
+
+<div class="clear"></div>
+<div class="aside_banner">
+    <div class="container">
+    <div class="not_found">
+        <img src="<?php echo URL::asset('public/img/front'); ?>/404_img.png" alt="img" />
+        </div>
+    </div>
+</div>
+<div class="clear"></div>
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.default', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>

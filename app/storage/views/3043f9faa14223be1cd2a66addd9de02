@@ -1,0 +1,110 @@
+<?php $__env->startSection('content'); ?>
+<script src="<?php echo URL::asset('public/js/jquery.validate.js'); ?>"></script>
+
+<script type="text/javascript">
+$(document).ready(function () {
+   
+      $.validator.addMethod("bsbno", function (value, element) {
+        return  this.optional(element) || (/^[0-9-]+$/.test(value));
+    }, "Contact Number is not valid.");
+    
+    $("#myform1").validate();
+});
+</script>
+<section>
+    <div class="top_menus">
+        <div class="dash_toppart">
+            <div class="wrapper"> 
+                <div class="_cttv">
+                    <?php echo $__env->make('elements/left_menu', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
+
+
+                </div></div></div>
+        <div class="wrapper">
+
+            <div class="acc_bar acc_bar_new">
+                <?php echo $__env->make('elements/oderc_menu', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
+
+                <div class="informetion informetion_new">
+                    <?php echo View::make('elements.actionMessage')->render(); ?>
+
+                   
+                    <div class="informetion_top">
+                        <div class="tatils">Bank Transfer Payments
+                
+                        </div>
+                        <div class="informetion_bx">
+
+                            <div class="informetion_bxes">
+                                
+                                        <div class="pery">
+                                            <div id="formloader" class="formloader" style="display: none;">
+                                                <?php echo HTML::image('public/img/loader_large_blue.gif','', array()); ?>
+
+                                            </div>
+                                            <?php echo View::make('elements.frontEndActionMessage')->render(); ?>
+
+                                            <?php echo Form::open(array('url' => '/user/bankTransferPayment', 'method' => 'post', 'id' => 'myform1', 'files' => true,'class'=>"cmxform form-horizontal tasi-form form")); ?>
+
+                                            <span class="require" style="float: left;width: 100%;">* Please note that all fields that have an asterisk (*) are required. </span>
+                                            <br><br>
+                                            <?php if($message = Session::get('message')): ?>
+                        <div class="alert alert-success alert-block">
+                        	<button type="button" class="close" data-dismiss="alert">×</button>	
+                                <strong><?php echo $message; ?></strong>
+                        </div>
+                        <?php endif; ?>
+                                            
+                
+                
+                                        
+                                        <div class="form_group">
+                                            <?php echo HTML::decode(Form::label('bsbno', "BSB No : <span class='require'>*</span>",array('class'=>"control-label col-lg-2"))); ?>
+
+                                           <div class="in_upt">
+                                                <?php if($bank_transfer) { ?><?php echo Form::text('bsbno',Input::old('bsbno', $bank_transfer->bsbno), array('class' => 'required number form-control','maxlength'=>'16')); ?> <?php } else { ?><?php echo Form::text('bsbno',Input::old('bsbno', ''), array('class' => 'required number form-control','maxlength'=>'16')); ?> <?php } ?>
+                                            </div>
+                                        </div>
+                
+                
+                                        <div class="form_group">
+                                            <?php echo HTML::decode(Form::label('account_no', "Account Number : <span class='require'>*</span>",array('class'=>"control-label col-lg-2 start_time"))); ?>
+
+                                           <div class="in_upt">
+                                                <?php if($bank_transfer) { ?> <?php echo Form::text('account_no',Input::old('account_no', $bank_transfer->account_no), array('class' => 'required number form-control')); ?> <?php } else { ?> <?php echo Form::text('account_no',Input::old('account_no', ''), array('class' => 'required number form-control')); ?> <?php } ?>
+                                            </div>
+                                        </div>
+                                        <div class="form_group">
+                                            <?php echo HTML::decode(Form::label('account_name', "Account Name : <span class='require'>*</span>",array('class'=>"control-label col-lg-2"))); ?>
+
+                                           <div class="in_upt">
+                                                <?php if($bank_transfer) { ?> <?php echo Form::text('account_name',Input::old('account_name', $bank_transfer->account_name), array('class' => 'required form-control account_name')); ?> <?php } else { ?> <?php echo Form::text('account_name',Input::old('account_name',''), array('class' => 'required form-control account_name')); ?> <?php } ?>
+                                            </div>
+                                        </div>
+                
+                                           
+                                            <div class="form_group input_bxxs">
+                                                <label>&nbsp;</label>
+                                                <div class="in_upt in_upt_res">
+                                                    <?php echo Form::submit('Submit', array('class' => "btn btn-primary")); ?>
+
+                                                    <?php echo Form::reset('Reset', array('class' => "btn btn-default")); ?>
+
+                                                </div>
+                                            </div>
+                                            </div>
+                                       
+                                </div>
+                               
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+</section>
+<?php $__env->stopSection(); ?>
+
+
+
+<?php echo $__env->make('layout', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>

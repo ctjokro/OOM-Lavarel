@@ -1,0 +1,215 @@
+<aside>
+    <div id="sidebar"  class="nav-collapse ">
+        <!-- sidebar menu start-->
+        <ul class="sidebar-menu" id="nav-accordion">
+            <li>
+                <a class="{{ Request::is('admin/admindashboard*') ? 'active' : '' }}" href="{{ URL::to( 'admin/admindashboard') }}">
+                    <i class="fa fa-dashboard"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+
+            <li class="sub-menu">
+                <a href="javascript:;" class="{{( Request::is('admin/editprofile*') or  Request::is('admin/changepassword*')  or  Request::is('admin/admintax*')  or  Request::is('admin/admindeliverycharge*') or  Request::is('admin/timeSettings*')   or  Request::is('admin/sitesetting*') or  Request::is('admin/changelogo*') or  Request::is('admin/admincommission*') ) ? 'active' : '' }}">
+                    <i class="fa fa-cogs"></i>
+                    <span>Configuration</span>
+                </a>
+                <ul class="sub" style="{{( Request::is('admin/editprofile*') or  Request::is('admin/changepassword*') or  Request::is('admin/timesettings*')  or  Request::is('admin/admindeliverycharge*')  )? 'display: block;' : '' }}">
+                    <li class="{{ Request::is('admin/changepassword*') ? 'active' : '' }}">
+                        <a class="{{ Request::is('admin/changepassword*') ? 'active' : '' }}" href="{{ URL::to( 'admin/changepassword') }}">
+                            Change Password
+                        </a>
+                    </li>
+                    <li class="{{ Request::is('admin/editprofile*') ? 'active' : '' }}"> 
+                        <a class="{{ Request::is('admin/editprofile*') ? 'active' : '' }}" href="{{ URL::to( 'admin/editprofile') }}">
+                            Edit Profile
+                        </a>
+                    </li>
+
+                    <li class="{{ Request::is('admin/admintax*') ? 'active' : '' }}"> 
+                        <a class="{{ Request::is('admin/admintax*') ? 'active' : '' }}" href="{{ URL::to( 'admin/admintax') }}">
+                            Tax Management
+                        </a>
+                    </li>
+                    <li class="{{ Request::is('admin/admincommission*') ? 'active' : '' }}"> 
+                        <a class="{{ Request::is('admin/admincommission*') ? 'active' : '' }}" href="{{ URL::to( 'admin/admincommission') }}">
+                            Commission Management
+                        </a>
+                    </li>
+                    <li class="{{ Request::is('admin/sitesetting*') ? 'active' : '' }}"> 
+                        <a class="{{ Request::is('admin/sitesetting*') ? 'active' : '' }}" href="{{ URL::to( 'admin/sitesetting') }}">
+                            Site Configuration
+                        </a>
+                    </li>
+                    <li class="{{ Request::is('admin/changelogo*') ? 'active' : '' }}"> 
+                        <a class="{{ Request::is('admin/changelogo*') ? 'active' : '' }}" href="{{ URL::to( 'admin/changelogo') }}">
+                            Site Logo
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="sub-menu">
+                <a href="javascript:;" class="{{Request::is('admin/restaurants*') ? 'active' : '' }}" >
+                    <i class="fa fa-user"></i>
+                    <span>Restaurants</span>
+                </a>
+                <ul class="sub" style="{{Request::is('admin/restaurants*') ? 'display: block;' : '' }}">
+                    <li class="{{ (Request::is('admin/restaurants/admin_index') OR Request::is('admin/restaurants/Admin_edituser*')) ? 'active' : '' }}">{{ link_to('/admin/restaurants/admin_index', 'Restaurants List', ['escape' => false]) }}</li>
+                    <li class="{{ Request::is('admin/restaurants/admin_add') ? 'active' : '' }}">{{ link_to('/admin/restaurants/admin_add', 'Add Restaurant', ['escape' => false]) }}</li>
+                </ul>
+            </li>
+            <li class="sub-menu">
+                <a href="javascript:;" class="{{Request::is('admin/banner*') ? 'active' : '' }}" >
+                    <i class="fa fa-image"></i>
+                    <span>Banner management</span>
+                </a>
+                <ul class="sub" style="{{Request::is('admin/banner*') ? 'display: block;' : '' }}">
+                    <li class="{{ (Request::is('admin/banner/admin_index') OR Request::is('admin/banner/Admin_edit*')) ? 'active' : '' }}">{{ link_to('/admin/banner/admin_index', 'Banner List', ['escape' => false]) }}</li>
+                    <li class="{{ Request::is('admin/banner/admin_add') ? 'active' : '' }}">{{ link_to('/admin/banner/admin_add', 'Add Banner', ['escape' => false]) }}</li>
+                </ul>
+            </li>
+
+            <li class="sub-menu">
+                <a href="javascript:;" class="{{Request::is('admin/customer*') ? 'active' : '' }}" >
+                    <i class="fa fa-users"></i>
+                    <span>Customers</span>
+                </a>
+                <ul class="sub" style="{{Request::is('admin/customer*') ? 'display: block;' : '' }}">
+                    <li class="{{ (Request::is('admin/customer/admin_index') OR Request::is('admin/customer/Admin_edituser*')) ? 'active' : '' }}">{{ link_to('/admin/customer/admin_index', 'Customers List', ['escape' => false]) }}</li>
+                    <li class="{{ Request::is('admin/customer/admin_add') ? 'active' : '' }}">{{ link_to('/admin/customer/admin_add', 'Add Customer', ['escape' => false]) }}</li>
+                </ul>
+            </li>
+            <li class="sub-menu">
+                <a href="javascript:;" class="{{Request::is('admin/sponsorship*') ? 'active' : '' }}" >
+                    <i class="fa fa-arrow-circle-up"></i>
+                    <span>Sponsorship Packages</span>
+                </a>
+                <ul class="sub" style="{{Request::is('admin/sponsorship*') ? 'display: block;' : '' }}">
+                    <li class="{{ (Request::is('admin/sponsorship/admin_index') OR Request::is('admin/sponsorship/Admin_edit*')) ? 'active' : '' }}">{{ link_to('/admin/sponsorship/admin_index', 'Package List', ['escape' => false]) }}</li>
+                    
+                </ul>
+            </li>
+<!--            <li class="sub-menu">
+                <a href="javascript:;" class="{{ (Request::is('admin/courier/admin_index') or Request::is('admin/courier/admin_add')) ? 'active' : '' }}" >
+                    <i class="fa fa-truck"></i>
+                    <span>Couriers</span>
+                </a>
+                <ul class="sub" style="{{Request::is('admin/courier*') ? 'display: block;' : '' }}">
+                    <li class="{{ (Request::is('admin/courier/admin_index') OR Request::is('admin/courier/Admin_edituser*')) ? 'active' : '' }}">{{ link_to('/admin/courier/admin_index', 'Couriers List', ['escape' => false]) }}</li>
+                    <li class="{{ Request::is('admin/courier/admin_add') ? 'active' : '' }}">{{ link_to('/admin/courier/admin_add', 'Add Courier', ['escape' => false]) }}</li>
+                </ul>
+            </li>-->
+
+            <li class="sub-menu">
+                <a href="javascript:;"  class="{{Request::is('admin/cuisine*') ? 'active' : '' }}">
+                    <i class="fa fa-cutlery"></i>
+                    <span>Cuisines</span>
+                </a>
+                <ul class="sub" style="{{Request::is('admin/cuisine*') ? 'display: block;' : '' }}">
+                    <li class="{{ (Request::is('admin/cuisine/admin_index') OR Request::is('admin/cuisine/Admin_editcuisine*')) ? 'active' : '' }}">{{ link_to('/admin/cuisine/admin_index', 'Cuisines List', ['escape' => false]) }}</li>
+                    <li class="{{ Request::is('admin/cuisine/admin_add') ? 'active' : '' }}">{{ link_to('/admin/cuisine/admin_add', 'Add Cuisine', ['escape' => false]) }}</li>
+                </ul>
+            </li>
+            
+            <li class="sub-menu">
+                <a href="javascript:;" class="{{Request::is('admin/mealtype*') ? 'active' : '' }}" >
+                    <i class="fa fa-coffee"></i>
+                    <span>Meal Types</span>
+                </a>
+                <ul class="sub" style="{{Request::is('admin/mealtype*') ? 'display: block;' : '' }}">
+                    <li class="{{ (Request::is('admin/mealtype/admin_index') OR Request::is('admin/mealtype/Admin_edit*')) ? 'active' : '' }}">{{ link_to('/admin/mealtype/admin_index', 'Mealtype List', ['escape' => false]) }}</li>
+                    <li class="{{ Request::is('admin/mealtype/admin_add') ? 'active' : '' }}">{{ link_to('/admin/mealtype/admin_add', 'Add Type', ['escape' => false]) }}</li>
+                </ul>
+            </li>
+            
+            <li class="sub-menu">
+                <a href="javascript:;"   class="{{(Request::is('admin/cities*') OR Request::is('admin/area*')) ? 'active' : '' }}">
+                    <i class="fa fa-building-o"></i>
+                    <span>Cities</span>
+                </a>
+                <ul class="sub" style="{{(Request::is('admin/cities*') OR Request::is('admin/area*')) ? 'display: block;' : '' }}">
+                    <li class="{{ (Request::is('admin/cities/admin_index') OR Request::is('admin/cities/Admin_editcity*') OR Request::is('admin/area*')) ? 'active' : '' }}">{{ link_to('/admin/cities/admin_index', 'Cities List', ['escape' => false]) }}</li>
+                    <li class="{{ Request::is('admin/cities/admin_add') ? 'active' : '' }}">{{ link_to('/admin/cities/admin_add', 'Add City', ['escape' => false]) }}</li>
+                </ul>
+            </li>
+
+<!--            <li class="sub-menu">
+                <a href="javascript:;"   class="{{(Request::is('admin/deliverycharge*')) ? 'active' : '' }}">
+                    <i class="fa fa-money"></i>
+                    <span>Delivery Charges</span>
+                </a>
+                <ul class="sub" style="{{(Request::is('admin/deliverycharge*')) ? 'display: block;' : '' }}">
+                    <li class="{{ (Request::is('admin/deliverycharge/admin_index') OR Request::is('admin/deliverycharge/Admin_edit*')) ? 'active' : '' }}">{{ link_to('/admin/deliverycharge/admin_index', 'Delivery Charges List', ['escape' => false]) }}</li>
+                    <li class="{{ Request::is('admin/deliverycharge/admin_add') ? 'active' : '' }}">{{ link_to('/admin/deliverycharge/admin_add', 'Add Delivery Charge', ['escape' => false]) }}</li>
+                </ul>
+            </li>-->
+            <li class="sub-menu">
+                <a href="javascript:;" class="{{Request::is('admin/order*') ? 'active' : '' }}" >
+                    <i class="fa fa-tasks"></i>
+                    <span>Orders</span>
+                </a>
+                <ul class="sub" style="{{Request::is('admin/order*') ? 'display: block;' : '' }}">
+                    <li class="{{ Request::is('admin/order/admin_index') ? 'active' : '' }}">{{ link_to('/admin/order/admin_index', 'Orders List', ['escape' => false]); }}</li>
+                </ul>
+            </li>
+
+<!--            <li class="sub-menu">
+                <a href="javascript:;" class="{{ (Request::is('admin/courier/admin_order') or Request::is('admin/courier/admin_addorder')) ? 'active' : '' }}" >
+                    <i class="fa fa-wheelchair"></i>
+                    <span>Courier Service Orders</span>
+                </a>
+                <ul class="sub" style="{{ (Request::is('admin/courier/admin_order') or Request::is('admin/courier/admin_addorder')) ? 'display: block;' : '' }}">
+                    <li class="{{ (Request::is('admin/courier/admin_order') OR Request::is('admin/courier/Admin_addorder')) ? 'active' : '' }}">{{ link_to('/admin/courier/admin_order', 'Courier Service Orders List', ['escape' => false]) }}</li>
+                    <li class="{{ Request::is('admin/courier/admin_addorder') ? 'active' : '' }}">{{ link_to('/admin/courier/admin_addorder', 'Add Courier Service Order', ['escape' => false]) }}</li>
+                </ul>
+            </li>-->
+
+            <li class="sub-menu">
+                <a href="javascript:;"   class="{{Request::is('admin/page*') ? 'active' : '' }}">
+                    <i class="fa  fa-files-o"></i>
+                    <span>Pages</span>
+                </a>
+                <ul class="sub" style="{{Request::is('admin/page*') ? 'display: block;' : '' }}">
+                    <li class="{{ (Request::is('admin/page/admin_index') OR Request::is('admin/page/Admin_editpage*')) ? 'active' : '' }}">{{ link_to('/admin/page/admin_index', 'Pages List', ['escape' => false]) }}</li>
+                    <li class="{{ Request::is('admin/page/admin_add') ? 'active' : '' }}">{{ link_to('/admin/page/admin_add', 'Add Page', ['escape' => false]) }}</li>
+
+                </ul>
+            </li>
+
+            <li class="sub-menu">
+                <a href="javascript:;" class="{{Request::is('admin/reviews*') ? 'active' : '' }}" >
+                    <i class="fa fa-comments"></i>
+                    <span>Reviews</span>
+                </a>
+                <ul class="sub" style="{{Request::is('admin/reviews*') ? 'display: block;' : '' }}">
+                    <li class="{{ (Request::is('admin/reviews/admin_index')) ? 'active' : '' }}">{{ link_to('/admin/reviews/admin_index', 'Reviews List', ['escape' => false]) }}</li>
+                </ul>
+            </li>
+
+
+            <li class="sub-menu">
+                <a href="javascript:;" class="{{Request::is('admin/coupon*') ? 'active' : '' }}" >
+                    <i class="fa fa-tags"></i>
+                    <span>Coupons</span>
+                </a>
+                <ul class="sub" style="{{Request::is('admin/coupon*') ? 'display: block;' : '' }}">
+                    <li class="{{ (Request::is('admin/coupon/admin_index')) ? 'active' : '' }}">{{ link_to('/admin/coupon/admin_index', 'Coupons List', ['escape' => false]) }}</li>
+                    <li class="{{ Request::is('admin/coupon/admin_add') ? 'active' : '' }}">{{ link_to('/admin/coupon/admin_add', 'Add Coupon', ['escape' => false]) }}</li>
+                </ul>
+            </li>
+            <li class="sub-menu">
+                <a href="javascript:;" class="{{Request::is('admin/payments*') ? 'active' : '' }}" >
+                    <i class="fa fa-money"></i>
+                    <span>Payments</span>
+                </a>
+                <ul class="sub" style="{{Request::is('admin/payments*') ? 'display: block;' : '' }}">
+                    <li class="{{ (Request::is('admin/payments')) ? 'active' : '' }}">{{ link_to('/admin/payments', 'Payment History', ['escape' => false]) }}</li>
+                    <li class="{{ (Request::is('admin/payments/sponsorships')) ? 'active' : '' }}">{{ link_to('/admin/payments/sponsorships', 'Sponsorship Payments', ['escape' => false]) }}</li>
+                    
+                </ul>
+            </li>
+        </ul>
+        <!-- sidebar menu end-->
+    </div>
+</aside>
