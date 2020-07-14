@@ -1460,6 +1460,12 @@ if (empty($caterer)) {
     function showRemovecart() {
         $cart = new Cart(new CartSession, new Cookie);
         $input = Input::all();
+        $url = Request::url();
+        $url1 = explode('https://', $url);
+        $url2 = explode('.', $url1[1]);
+        $rest = DB::table('users')->where('unique_name', $url2[0])->first(); 
+        $tz_cu = DB::table('timezone_currency')->where('user_id', $rest->id)->first();
+        $currency = $tz_cu->currency;
         $content = $cart->contents();
         if (!empty($content)) {
             foreach ($content as $item) {
@@ -1474,7 +1480,7 @@ if (empty($caterer)) {
             Session::forget('session_address_id');
         }
         $content = $cart->contents(true);
-        $view = View::make('home.cart')->with('cart', $cart)->with('cart_content', $content)->with('order', (isset($input['order']) ? $input['order'] : 0));
+        $view = View::make('home.cart')->with('cart', $cart)->with('cart_content', $content)->with('order', (isset($input['order']) ? $input['order'] : 0))->with('currency', $currency);
         $html = $view->render();
         return json_encode(array('data' => $html, 'valid' => true));
     }
@@ -2520,7 +2526,10 @@ if (empty($caterer)) {
     function showOrder() {
         // get cart contents
         $cart = new Cart(new CartSession, new Cookie);
-
+        if(Session::get('order_id'))
+        {
+            Session::put('order_id', '');
+        }
         // get current user details
         $user_id = Session::get('user_id');
         $address_id = 0;
@@ -2934,12 +2943,35 @@ if (empty($caterer)) {
                         ->where('id', $order_id)
                         ->update(array('order_item_id' => $menu_items_id));
                 //  echo $order_id; exit;
-                if($input['payment_method'] == "bank_transfer")
+                if($input['payment_method'] == "xendit_gateway")
+                {
+                    if($input['xendit-card-selection'] == "xendit_credit")
+                    {
+                        Session::put('gTotal', $gTotal);
+                        Session::put('order_id', $order_id);
+                        Session::put('user_id', Session::get('user_id'));
+                        Session::put('credit_crad', "credit_crad");
+                        
+                        return Redirect::to('/get-payment-page');    
+                    }
+                    elseif($input['xendit-card-selection'] == "xendit_debit")
+                    {
+                        Session::put('gTotal', $gTotal);
+                        Session::put('order_id', $order_id);
+                        Session::put('user_id', Session::get('user_id'));
+                        Session::put('debit_crad', "debit_crad");
+                        
+                        return Redirect::to('/debit-link-up');    
+                    }
+                    
+                }
+                else if($input['payment_method'] == "bank_transfer")
                 {
                     Session::put('gTotal', $gTotal);
                     return Redirect::to('/payment/success/' . $order_id);
                 }
-                
+                else
+                {
                 Session::put('gTotal', $gTotal);
 
 //                $cart->destroy();
@@ -2949,83 +2981,84 @@ if (empty($caterer)) {
 
 //                echo $gTotal;die;
 
-                if ($gTotal > 0) {
-//                  
-                    //return Redirect::to('/user/myaccount')->with('success_message', 'Thanks for ordering with us. Your order details are submitted successfully. You will receive confirmaion message after acceptance of your order.');
-                    if ($payment_mode == 0) {
-                        $amount = $gTotal;
-                        $email = $catererData->paypal_email_address;
-                        //$userInfo = $this->User->find('first',array('conditions'=>array('User.id'=>$this->Session->read('user_id'))));
-
-                        $nameArray = explode(' ', $input['full_name']);
-                        $fname = $nameArray[0];
-                        if (isset($nameArray[1]) && $nameArray[1]) {
-                            $lname = $nameArray[1];
+                    if ($gTotal > 0) {
+    //                  
+                        //return Redirect::to('/user/myaccount')->with('success_message', 'Thanks for ordering with us. Your order details are submitted successfully. You will receive confirmaion message after acceptance of your order.');
+                        if ($payment_mode == 0) {
+                            $amount = $gTotal;
+                            $email = $catererData->paypal_email_address;
+                            //$userInfo = $this->User->find('first',array('conditions'=>array('User.id'=>$this->Session->read('user_id'))));
+    
+                            $nameArray = explode(' ', $input['full_name']);
+                            $fname = $nameArray[0];
+                            if (isset($nameArray[1]) && $nameArray[1]) {
+                                $lname = $nameArray[1];
+                            } else {
+                                $lname = '';
+                            }
+    
+    //                    $countryInfo = $this->Country->find('first', array('conditions' => array('Country.id' => $this->data['Payment']['country'])));
+                            //pr($countryInfo);exit;
+    //                    $zip11 = $this->data['Payment']['zipcode'];
+    //                    $currency11 = $campaigns['Campaign']['currency'];
+    //                    $country11 = $countryInfo['Country']['name'];
+                            $zip11 = "";
+                            //$currency11 = CURR;
+                            $currency11 = $currency;
+                            $country11 = '';
+    
+                            //pr($this->data);exit;
+                            $cardType = 'VISA';
+                            $cardNumber = $input['card_number'];
+                            $cardVcc = $input['card_cvv'];
+                            $month = $input['card_exp_month'];
+                            $year = $input['card_exp_year'];
+                            $countryCode = "";
+    
+                            // Set request-specific fields.
+                            $paymentType = urlencode('Authorization');    // or 'Sale'
+                            $firstName = urlencode($fname);
+                            $lastName = urlencode($lname);
+                            $creditCardType = urlencode($cardType);
+                            $creditCardNumber = urlencode($cardNumber);
+                            $expDateMonth = $month;
+                            $padDateMonth = urlencode(str_pad($expDateMonth, 2, '0', STR_PAD_LEFT));
+    
+                            $expDateYear = urlencode($year);
+                            $cvv2Number = urlencode($cardVcc);
+                            $zip = urlencode($zip11);
+                            $country = urlencode($countryCode);    // US or other valid country code
+                            $amount = urlencode($amount);
+                            $currencyID = urlencode($currency11);       // or other currency ('GBP', 'EUR', 'JPY', 'CAD', 'AUD')
+                            // Add request-specific fields to the request string.
+                            $nvpStr = "&PAYMENTACTION=$paymentType&AMT=$amount&CREDITCARDTYPE=$creditCardType&ACCT=$creditCardNumber" .
+                                    "&EXPDATE=$padDateMonth$expDateYear&CVV2=$cvv2Number&FIRSTNAME=$firstName&LASTNAME=$lastName" .
+                                    "&ZIP=$zip&COUNTRYCODE=$country&CURRENCYCODE=$currencyID";
+    
+    
+                            //pr($nvpStr);exit;
+                            // Execute the API operation; see the PPHttpPost function above.
+                            $httpParsedResponseAr = $this->PPHttpPost('DoDirectPayment', $nvpStr, $catererData->id);
+    
+                            //print_r($httpParsedResponseAr); exit;
+                            if ("SUCCESS" == strtoupper($httpParsedResponseAr["ACK"]) || "SUCCESSWITHWARNING" == strtoupper($httpParsedResponseAr["ACK"])) {
+                                $transactionId = $httpParsedResponseAr['TRANSACTIONID'];
+    
+                                return Redirect::to('/payment/success/' . $order_id . '/' . $transactionId);
+                            } else {
+                                $error = urldecode($httpParsedResponseAr['L_LONGMESSAGE0']);
+    
+                                $shopData = DB::table('orders')
+                                        ->where('id', $order_id)
+                                        ->delete();
+                                return Redirect::to('/order/confirm/')->with('error_message', $error);
+                            }
                         } else {
-                            $lname = '';
-                        }
-
-//                    $countryInfo = $this->Country->find('first', array('conditions' => array('Country.id' => $this->data['Payment']['country'])));
-                        //pr($countryInfo);exit;
-//                    $zip11 = $this->data['Payment']['zipcode'];
-//                    $currency11 = $campaigns['Campaign']['currency'];
-//                    $country11 = $countryInfo['Country']['name'];
-                        $zip11 = "";
-                        //$currency11 = CURR;
-                        $currency11 = $currency;
-                        $country11 = '';
-
-                        //pr($this->data);exit;
-                        $cardType = 'VISA';
-                        $cardNumber = $input['card_number'];
-                        $cardVcc = $input['card_cvv'];
-                        $month = $input['card_exp_month'];
-                        $year = $input['card_exp_year'];
-                        $countryCode = "";
-
-                        // Set request-specific fields.
-                        $paymentType = urlencode('Authorization');    // or 'Sale'
-                        $firstName = urlencode($fname);
-                        $lastName = urlencode($lname);
-                        $creditCardType = urlencode($cardType);
-                        $creditCardNumber = urlencode($cardNumber);
-                        $expDateMonth = $month;
-                        $padDateMonth = urlencode(str_pad($expDateMonth, 2, '0', STR_PAD_LEFT));
-
-                        $expDateYear = urlencode($year);
-                        $cvv2Number = urlencode($cardVcc);
-                        $zip = urlencode($zip11);
-                        $country = urlencode($countryCode);    // US or other valid country code
-                        $amount = urlencode($amount);
-                        $currencyID = urlencode($currency11);       // or other currency ('GBP', 'EUR', 'JPY', 'CAD', 'AUD')
-                        // Add request-specific fields to the request string.
-                        $nvpStr = "&PAYMENTACTION=$paymentType&AMT=$amount&CREDITCARDTYPE=$creditCardType&ACCT=$creditCardNumber" .
-                                "&EXPDATE=$padDateMonth$expDateYear&CVV2=$cvv2Number&FIRSTNAME=$firstName&LASTNAME=$lastName" .
-                                "&ZIP=$zip&COUNTRYCODE=$country&CURRENCYCODE=$currencyID";
-
-
-                        //pr($nvpStr);exit;
-                        // Execute the API operation; see the PPHttpPost function above.
-                        $httpParsedResponseAr = $this->PPHttpPost('DoDirectPayment', $nvpStr, $catererData->id);
-
-                        //print_r($httpParsedResponseAr); exit;
-                        if ("SUCCESS" == strtoupper($httpParsedResponseAr["ACK"]) || "SUCCESSWITHWARNING" == strtoupper($httpParsedResponseAr["ACK"])) {
-                            $transactionId = $httpParsedResponseAr['TRANSACTIONID'];
-
-                            return Redirect::to('/payment/success/' . $order_id . '/' . $transactionId);
-                        } else {
-                            $error = urldecode($httpParsedResponseAr['L_LONGMESSAGE0']);
-
-                            $shopData = DB::table('orders')
-                                    ->where('id', $order_id)
-                                    ->delete();
-                            return Redirect::to('/order/confirm/')->with('error_message', $error);
+                            return Redirect::to('/payment/openshop/' . $order_id);
                         }
                     } else {
-                        return Redirect::to('/payment/openshop/' . $order_id);
+                        return Redirect::to('/payment/success/' . $order_id);
                     }
-                } else {
-                    return Redirect::to('/payment/success/' . $order_id);
                 }
             }
         }
@@ -4127,6 +4160,10 @@ if (empty($caterer)) {
         // get cart contents
         $cart = new Cart(new CartSession, new Cookie);
         $content = $cart->contents(true);
+         $timezone_currency = DB::table('timezone_currency')
+                        ->where("timezone_currency.user_id", "=", $caterer->id)
+                        ->first();
+                        $currency = $timezone_currency->currency;
 
         //$this->layout->title = TITLE_FOR_PAGES . 'Restauranting Menu - ' . $caterer->first_name . " " . $caterer->last_name;
         return View::make('/home/menudetail')
@@ -4134,6 +4171,7 @@ if (empty($caterer)) {
                         ->with("menuData", $menuData)
                         ->with("cuisine", $cuisine)
                         ->with("cart_content", $content)
+                         ->with("currency", $currency)
                         ->with("cart", $cart);
     }
 
@@ -4173,6 +4211,26 @@ if (empty($caterer)) {
                 ->get();
         echo json_encode(array('valid' => 1, 'likes' => count($allLikedata), 'dislike' => count($allDisLikedata)));
         exit;
+    }
+    
+    public function getPaymantPage()
+    {
+        return View::make('/Users/credit-card-details');   
+    }
+    
+    public function debitLinkUp()
+    {
+        return View::make('/Users/debit-link-up');   
+    }
+    
+    public function verifyOTP()
+    {
+        return View::make('/Users/otp-payment-verification');   
+    }
+    
+    public function getPayment()
+    {
+        return View::make('/Users/verify-payment');   
     }
 
 }

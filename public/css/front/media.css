@@ -336,7 +336,8 @@ margin: 5px 0px 5px;}
 .new_pop_up .modal-content{width: 98%; margin: 20% auto; padding: 10px 10px 20px;}
 .platenumber{width: 100%;}
 .summrydiv{width: 100%;}
-.img_fream_img img{width: 100%; height: 100%;}
+.img_fream_img img{width: 171%; height: 84%;margin-top: -3px;margin-left: -33px;}
+/*.img_fream_img img{width: 100%; height: 100%;}*/
 .search-page-text .list_menus li .filedd{word-wrap: break-word;}
 .listin_new .listing_bxs_right h1 a {
 	width: 100%;

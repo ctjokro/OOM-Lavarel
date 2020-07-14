@@ -7,4 +7,4 @@
 
 $cart = new Cart(new CartSession, new Cookie);
             ?> 
-{{html_entity_decode(HTML::link('order/confirm', $cart->totalItems())); }}
+{{html_entity_decode(HTML::link('order/confirm', '<i class="fa fa-shopping-cart" aria-hidden="true"></i>'.$cart->totalItems())); }}

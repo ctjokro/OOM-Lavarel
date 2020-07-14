@@ -9,7 +9,7 @@
                  @include('elements/left_menu')
                  
                  
-        </div></div></div>
+        </div></div></div> 
         
         
         <div class="wrapper">
@@ -18,6 +18,14 @@
                  
 
                 <div class="informetion informetion_new">
+                    <div id="success_payment_message">
+                        @if($message = Session::get('xendit_success_message'))
+                        <div class="alert alert-success alert-block">
+                        	<button type="button" class="close" id="close_message_alert" data-dismiss="alert">×</button>	
+                                <strong>{{ $message }}</strong>
+                        </div>
+                        @endif  
+                    </div>
                     {{ View::make('elements.actionMessage')->render() }}
                     <div class="informetion_top">
                         <div class="tatils"><span class="personal">Personal info</span>
@@ -253,5 +261,13 @@
     </div>
 </section>
 @stop
+<script charset="utf-8" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+$(document).ready(function(){
+    $('#close_message_alert').click(function(){
+        <?php Session::put('xendit_success_message', '')  ?>
+    })
+})
+</script>
 
 

@@ -99,6 +99,12 @@ $data = DB::table('users')
             <li class="{{ Request::is('user/bankTransferPayment') ? 'active' : '' }}">
                 <?php echo html_entity_decode(HTML::link('user/bankTransferPayment', '<i class="fa fa-exchange"></i> Bank Transfer Payment ', array('style' => 'border-right:none', 'class' => 'icon-4', 'title' => 'Bank Transfer Payments'))); ?>
             </li>
+             <li class="{{ Request::is('user/paymentMethod') ? 'active' : '' }}">
+                <?php echo html_entity_decode(HTML::link('user/paymentMethod', '<i class="fa fa-exchange"></i> Payment Method ', array('style' => 'border-right:none', 'class' => 'icon-4', 'title' => 'Payment Method'))); ?>
+            </li>
+             <li class="{{ Request::is('order/paymentQrcode') ? 'active' : '' }}">
+                <?php echo html_entity_decode(HTML::link('order/paymentQrcode', '<i class="fa fa-exchange"></i> Payment Qrcode ', array('style' => 'border-right:none', 'class' => 'icon-4', 'title' => 'Payment Qrcode'))); ?>
+            </li>
             <li class="{{ Request::is('user/paymenthistory/sponsorship') ? 'active' : '' }}">
                 <?php echo html_entity_decode(HTML::link('user/paymenthistory/sponsorship', '<i class="fa fa-money"></i> Sponsorship History', array('style' => 'border-right:none', 'class' => 'icon-4', 'title' => 'Payment History'))); ?>
             </li> 

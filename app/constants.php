@@ -47,6 +47,12 @@ define('DISPLAY_FULL_PROFILE_IMAGE_PATH', 'uploads/users/');
 
 define('TEMP_PATH', 'uploads/temp');
 
+define('DISPLAY_FULL_QR_IMAGE_PATH', 'uploads/paymentQrcode/');
+
+define('UPLOAD_FULL_QR_IMAGE_PATH', 'uploads/paymentQrcode');
+
+define('QR_PATH', 'uploads/paymentQrcode');
+
 define('UPLOAD_LOGO_IMAGE_PATH', 'uploads/logo/');
 define('DISPLAY_LOGO_IMAGE_PATH', 'uploads/logo/');
 define('CAPTCHA_KEY', '6LfFdgkUAAAAAAuyZPrYswKbxxOBLVy_841PSSKj');

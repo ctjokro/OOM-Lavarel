@@ -8,7 +8,14 @@ $cart = new Cart(new CartSession, new Cookie);
 $adminuser = DB::table('site_settings')->first();
 ?>
 <?php
-$order_id = Session::get('order_id');
+if(Session::get('credit_crad') || Session::get('debit_crad'))
+{
+    $order_id = Session::put('order_id', '');    
+}
+else
+{
+    $order_id = Session::get('order_id');
+}
 
 if (!empty($order_id)) {
     $orderData = DB::table('orders')
@@ -121,7 +128,7 @@ if (!empty($order_id)) {
                     }else{
                         $unique_name = $userData->slug;
                     }
-                    $URL = "http://".$unique_name.".".SERVER_PATH;
+                    $URL = "https://".$unique_name.".".SERVER_PATH;
                    
                    if (file_exists(DISPLAY_FULL_PROFILE_IMAGE_PATH . $userData->profile_image) and $userData->profile_image) {
                         ?>
@@ -160,7 +167,7 @@ if (!empty($order_id)) {
                     }else{
                         $unique_name = $userData->slug;
                     }
-                    $URL = "http://".$unique_name.".".SERVER_PATH; //print_r($URL);?>
+                    $URL = "https://".$unique_name.".".SERVER_PATH; //print_r($URL);?>
                   
                         <div class="navbar-brand asdf"><a  href="<?php echo $URL; ?>" style="font-size:12px;"><img style="border-radius: 12%;height: 75px;align-content: center;width: 100px;" src="<?php echo URL::asset('public/assets/timthumb.php?src='.HTTP_PATH.DISPLAY_FULL_PROFILE_IMAGE_PATH.$userData->profile_image.'&w=900&h=500&zc=2&q=500'); ?>"/></a><br><span style="color: gray;font-size: 12px;font-weight: 700;margin-left: -30px;"><a href="<?php echo MAIN_HTTP_PATH.'welcome'; ?>"/>powered by <img src=<?php echo $URL.DISPLAY_LOGO_IMAGE_PATH.SITE_LOGO;?> style="width: 108px"></a></span></div>
                          <?php
@@ -206,7 +213,7 @@ if (!empty($order_id)) {
                     }else{
                         $unique_name = $userData->slug;
                     }
-                    $URL = "http://".$unique_name.".".SERVER_PATH; //print_r($URL);?>
+                    $URL = "https://".$unique_name.".".SERVER_PATH; //print_r($URL);?>
                         <!--<a class="navbar-brand" href="<?php echo MAIN_HTTP_PATH; ?>"><?php echo HTML::image(DISPLAY_LOGO_IMAGE_PATH.SITE_LOGO, '', array()); ?></a>-->
                        
                         <div class="navbar-brand asdf"><a  href="<?php echo $URL; ?>" style="font-size:12px;"><img style="border-radius: 12%;height: 75px;align-content: center;width: 100px;" src="<?php echo URL::asset('public/assets/timthumb.php?src='.HTTP_PATH.DISPLAY_FULL_PROFILE_IMAGE_PATH.$userData->profile_image.'&w=900&h=500&zc=2&q=500'); ?>"/></a><br><span style="color: gray;font-size: 12px;font-weight: 700;margin-left: -30px;"><a href="<?php echo MAIN_HTTP_PATH.'welcome'; ?>"/>powered by <img src=<?php echo $URL.DISPLAY_LOGO_IMAGE_PATH.SITE_LOGO;?> style="width: 108px"></a></span></div>
@@ -232,11 +239,54 @@ if (!empty($order_id)) {
                 ?>
 
             </div>    
+<style>
+    @media  screen and (max-width: 992px)
+.cart_menu .mobilemenu i {
+    width: 55px !important;
+    height: 46px !important;
+    position: absolute !important;
+    right: 0 !important;
+    top: 10px !important;
+    cursor: pointer !important;
+    z-index: 12399994 !important;
+    
+}
+
+.mobilemenu
+{
+    margin-top: 23px !important;
+}
 
 
-            <div id="head-mobile"></div>
+.mobilemenu a
+{
+background-color: white !important;
+}
+
+.mobilemenu i
+{
+/*margin-left: 100px !important;*/
+margin-left: -38px !important;
+    margin-top: -11px !important;
+}
+
+.cart_menu .mobilemenu a
+{
+    margin-left: -100px !important;
+    margin-top: 4px !important;
+    
+}
+
+
+.cart_menu .mobilemenu a:hover {
+    background: transparent !important;
+}
+</style>
+
+            <div id="head-mobile"><div class="cart_menu mobilemenu" id="cart_bt" title="Go to cart"><?php echo html_entity_decode(HTML::link('order/confirm', '<i class="fa fa-shopping-cart" aria-hidden="true"></i>'.$cart->totalItems()));; ?></div> </div>
+           
             <div class="buttonn"></div>
-
+            
             <ul>
                 <li>
                     <?php

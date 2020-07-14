@@ -44,7 +44,8 @@ if ($caterer->open_close) {
     <div class="like_n">{{$menuData->description}}</div></div></div> 
     <div class="full_row">
   
-        <div class="left_main2" style="display: none">
+        <div class="left_main2">
+            <!--<div class="left_main2" style="display: none">-->
 
             <!--<input type="button" value="-" class="but_1 counter_number"  id_val="{{$menuData->id}}"  alt="minus" />-->
             <input readonly="readonly" maxlength="3" type="hidden" value="{{isset($key_array[$menuData->id]) ? $key_array[$menuData->id] : 0}}" class='{{"preparation_time_".$menuData->id}}' />
@@ -89,7 +90,10 @@ if ($caterer->open_close) {
                   $idNCV = "newc";
                  
               }
-              ?><li><label>{{$addonDataVal->name}}</label> <span class="pricev">{{number_format($addonDataVal->price,2)}}</span> <span data-name-variant="{{$addonDataVal->name}}" data-price-variant="{{$addonDataVal->price}}" data-id-variant="{{$addonDataVal->id}}" data-type="Variant" id="<?php echo $idNCV; ?>" class="btnv">Get it</span></li><?php
+              ?><li><label>{{$addonDataVal->name}}</label> <span class="pricev"><?php  foreach(Config::get('constant') as $key => $c) { 
+                                                                    if($key == $currency)
+                                                                        {
+                                                                          echo $c; } } ?>{{number_format($addonDataVal->price,2)}}</span> <span data-name-variant="{{$addonDataVal->name}}" data-price-variant="{{$addonDataVal->price}}" data-id-variant="{{$addonDataVal->id}}" data-type="Variant" id="<?php echo $idNCV; ?>" class="btnv">Get it</span></li><?php
           }
           echo "</ul>";
           ?></div></div><?php

@@ -43,8 +43,11 @@ Route::group(array('prefix' => 'admin'), function() {
     Route::get('/login', 'AdminController@showAdminlogin');
 });
 
-
-
+//Xendit
+Route::any('/get-payment-page', 'HomeController@getPaymantPage');
+Route::any('/debit-link-up', 'HomeController@debitLinkUp');
+Route::any('/verify-otp', 'HomeController@verifyOTP');
+Route::any('/payment', 'HomeController@getPayment');
 
 Route::get('/admin/user/admin_index', array('as' => 'admin.admin_index', 'uses' => 'UserController@all'));
 
@@ -284,6 +287,7 @@ Route::get('/user/myreviews', 'UserController@showReview');
 Route::any('/user/paymenthistory/{type}', 'UserController@paymenthistory');
 Route::any('/user/receivedpayment', 'UserController@receivedpayment');
 Route::any('/user/bankTransferPayment', 'UserController@bankTransferPayment');
+Route::any('/user/paymentMethod', 'UserController@paymentMethod');
 
 
 
@@ -416,6 +420,8 @@ Route::any('/order/myorders/{slug}', 'OrderController@showMyorders');
 Route::any('/order/mainorders', 'OrderController@showMainorders');
 Route::any('/order/receivedorders', 'OrderController@showreceivedorders');
 Route::any('/order/receivedview/{id}', 'OrderController@showreceivedview');
+
+Route::any('/order/paymentQrcode', 'OrderController@paymentQrcode');
 
 Route::any('/order/receivedviewadmin/{id}', 'OrderController@showreceivedviewadmin');
 
@@ -581,3 +587,8 @@ Route::get('/user/deactivedeliveryperson/{id}', 'UserController@deactivedelivery
 Route::get('/user/activekitchenstaff/{id}', 'UserController@activekitchenstaff');
 Route::get('/user/deactivekitchenstaff/{id}', 'UserController@deactivekitchenstaff');
 
+//Xendit
+Route::post('/xendit-create-charge', 'UserController@XenditCreditCardCharge');
+Route::post('/link-customer-to-bank', 'UserController@xenditPayment');
+Route::post('/verify-customer-otp', 'UserController@verifyCustomerOTP');
+Route::post('/payment', 'UserController@debitPayment');

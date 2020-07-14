@@ -468,7 +468,7 @@ function chkForm() {
                     return false;
                 }
             } else {
-                if ($("#checkboxs").prop('checked') == true) {
+                /*if ($("#checkboxs").prop('checked') == true) {
                     return true;
                 } else {
                     swal({
@@ -478,6 +478,28 @@ function chkForm() {
                         html: true
                     });
                     return false;
+                }*/
+                if (typeof $("input[name='payment_method']:checked").val() === "undefined") {
+                    swal({
+                        title: "Sorry!",
+                        text: "Please select any payment option!",
+                        type: "error",
+                        html: true
+                    });
+                    return false;
+                }else{
+                    if ($("#checkboxs").prop('checked') == true) {
+                        return true;
+                    } else {
+                        swal({
+                            title: "Sorry!",
+                            text: "Please select terms and conditions first!",
+                            type: "error",
+                            html: true
+                        });
+                        return false;
+                    }
+                    return true;
                 }
 
             }
@@ -1262,13 +1284,22 @@ $adminData = DB::table('admins')
                                             Paypal </div>-->
                                             
                                              <label>
-                                             
+                                             <?php  $user_restro = $restro_id;
+                                                $user_detail = DB::table('users')->where('id', $user_restro)->first(); ?>
+                                                <?php 
+                                                $rf = explode(',',$user_detail->payment_method);
+                                               
+                                                 //print_r(array_count($user_detail->payment_method));
+                                                 for ($i = 0; $i < count($rf); $i++) { 
+                                                 // for($i=0;$i<=count($user_detail->payment_method);$i++) { 
+                                                  if($rf[$i]== 'Paypal') { 
+                                                ?>
                                              <div class="_cttvvv active" data-div="paypal" data-value="1">
                                                   <input type="radio" name="payment_method" value="small">
                                                     <span class="_imgh"><?php echo HTML::image(HTTP_PATH . "public/img/paypal.png"); ?></span>
                                                     <!--Pay safely and faster with Paypal--> </div>
                                                     </label>
-                                            
+                                            <?php } else if($rf[$i]== 'Bank Transfer') { ?>
                                             &nbsp;&nbsp;&nbsp;
                                             <?php //$user_id = Session::get('user_id');
                                             $user_restro = $restro_id;
@@ -1288,15 +1319,59 @@ $adminData = DB::table('admins')
                                             </label>
                                             <?php } else { ?>
                                                
+                                                 <?php } ?>
+                                                
+                                                <?php } else if($rf[$i]== 'Qrcode') { ?>
+                                            &nbsp;&nbsp;&nbsp;
+                                            <?php //$user_id = Session::get('user_id');
+                                            $user_restro = $restro_id;
+                                                $qrcode = DB::table('users')->where('id', $user_restro)->first();
+                                                //$user = DB::table('users')->where('id', $user_restro)->first();
+                                               
+                                                ?>
+                                                <input type="hidden" name="restaurant_id" value="<?php echo $user_restro; ?>">
+                                                
+                                            <?php if($qrcode->payment_qrcode != '')
+                                               {
+                                               ?>
+                                             <label>
+                                               <div class="_cttvvv active" data-div="Qrcode" data-value="4">
+                                                   <input type="radio" name="payment_method" id="Qrcode" value="Qrcode">
+                                              
+                                                <b>Qrcode</b> </div>
+                                                
+                                            </label>
+                                            <?php } else { ?>
+                                               
                                                 <?php } ?>
+                                                <?php } if($rf[$i]== 'Payment Gateway') { ?>
+                                                &nbsp;&nbsp;&nbsp;
+                                                <label>
+                                                <div class="_cttvvv active" data-div="payment_gateway" data-value="3">
+                                                   <input type="radio" name="payment_method" id="xendit_gateway" value="xendit_gateway">
+                                              
+                                                <b>CreditCard/DebitCard</b> </div>
+                                                </label>
                                             <?php //$user_id = Session::get('user_id');
                                             $user_restro = $restro_id;
                                                 $bank_detail = DB::table('bank_transfer_detail')->where('user_id', $user_restro)->first();
                                                 $user = DB::table('users')->where('id', $user_restro)->first();
                                                
                                                 ?>
+                                                
+                                                <?php } } ?>
+                                            
+                                            <div id="xendit-option" style='display:none'>
+                                                <input type="radio" name="xendit-card-selection" value="xendit_credit"/>&nbsp;<b>Credit</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                <input type="radio" name="xendit-card-selection" value="xendit_debit"/>&nbsp;<b>Debit(BANK BRI)</b>
+                                                <div style="margin-top: 10px;font-size: 15px;color: red;"><p>Note: This Payment option is only for indonesian customers.</p></div>
+                                            </div>   
+                                              
                                             <div id='show-me' style='display:none'>
                                                
+                                              <?php  $user_restro = $restro_id;
+                                                $bank_detail = DB::table('bank_transfer_detail')->where('user_id', $user_restro)->first();
+                                                $user = DB::table('users')->where('id', $user_restro)->first(); ?>
                                                <?php if($bank_detail != '')
                                                {
                                                ?>
@@ -1325,9 +1400,49 @@ $adminData = DB::table('admins')
                                                 <?php } ?>
                                                 
                                                 </div>
+                                                
+                                                <div id='show-qrcode' style='display:none'>
+                                              <?php  $user_restro = $restro_id;
+                                                $qrcode_detail = DB::table('users')->where('id', $user_restro)->first();
+                                                
+                                               // $user = DB::table('users')->where('id', $user_restro); ?>
+                                                
+                                               <?php if($qrcode_detail->payment_qrcode != '')
+                                               {
+                                               ?>
+                                                <div id="block_container">
+                                                    <div id="block1">
+                                                       
+                                                       <div class="form_group">
+                                                            
+                                                            <div class="in_upt">
+                                                                <div class="in_upt_img">
+                                                                    <?php if (file_exists(UPLOAD_FULL_PROFILE_IMAGE_PATH . '/' . $qrcode_detail->payment_qrcode) && $qrcode_detail->payment_qrcode != "") { ?>
+                                                                        <?php echo HTML::image(DISPLAY_FULL_PROFILE_IMAGE_PATH.$qrcode_detail->payment_qrcode, ''); ?>
+
+                                                                       
+                                                                        <?php
+                                                                    } else {
+                                                                        echo HTML::image('public/img/front/nouser.png', '', array());
+                                                                    }
+                                                                    ?>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                   
+                                                </div>
+                                               
+                                                <?php } else { ?>
+                                               
+                                                <?php } ?>
+                                                
+                                            </div>
                                             <script>
                                                 $("input[name='payment_method']").click(function () {
                                                         $('#show-me').css('display', ($(this).val() === 'bank_transfer') ? 'block':'none');
+                                                        $('#show-qrcode').css('display', ($(this).val() === 'Qrcode') ? 'block':'none');
+                                                        $('#xendit-option').css('display', ($(this).val() === 'xendit_gateway') ? 'block':'none');
                                                     });
                                             </script>
 

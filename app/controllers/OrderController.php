@@ -2112,6 +2112,132 @@ class OrderController extends BaseController {
                 ->with('userData', $userData)
                 ->with('records', $records);
     }
+    
+    public function paymentQrcode() {
+       
+        $this->logincheck('user/paymentQrcode');
+        if (Session::has('user_id')) {
+            //return Redirect::to('/user/myaccount');
+        } else {
+            return Redirect::to('/');
+        }
+
+        $slug = "purchase";
+
+
+        $this->layout->title = TITLE_FOR_PAGES . 'Payment Qr code';
+
+        $user_id = Session::get('user_id');
+        $userData = DB::table('users')
+                ->where('id', $user_id)
+                ->first();
+
+        $input = Input::all();
+        $this->layout->content = View::make('/Users/paymentQrcode')
+                ->with('userData', $userData);
+
+        if (!empty($input)) {
+            if (Input::hasFile('payment_qrcode'))
+                $rules = array(
+                    'payment_qrcode' => 'required|mimes:jpeg,png,jpg',
+                );
+            else
+                $rules = array(
+                    'payment_qrcode' => 'required',
+                );
+
+            // run the validation rules on the inputs from the form
+            $validator = Validator::make(Input::all(), $rules);
+
+            // if the validator fails, redirect back to the form
+            if ($validator->fails()) {
+                //die('dfdf');
+           $this->layout->content = View::make('/Users/paymentQrcode')->withErrors($validator);
+               // return Redirect::to('/user/paymentQrcode') ->withErrors($validator);
+            } else {
+
+                include("vendor/ImageManipulator.php");
+                if (Input::hasFile('payment_qrcode')) {
+                    $file = Input::file('payment_qrcode');
+                     $user_id = Session::get('user_id');
+                    $paymentQrcodeName = $file->getClientOriginalName();
+                     $qrcodeImageName = $user_id.'_'.$paymentQrcodeName;
+                    $file->move(UPLOAD_FULL_PROFILE_IMAGE_PATH,$qrcodeImageName);
+                   $qrcodeImageName = $user_id.'_'.$paymentQrcodeName;
+                    list($width, $height, $type, $attr) = getimagesize('uploads/users/' . $qrcodeImageName);
+                    if ($width > 600) {
+                        $qrcodeImageName = $user_id.'_'.$paymentQrcodeName;
+                        $manipulator = new ImageManipulator('uploads/users/' . $qrcodeImageName);
+
+                        // resizing to 200x200
+                        $manipulator->resample(600, 600);
+                         $qrcodeImageName = $user_id.'_'.$paymentQrcodeName;
+                        $manipulator->save('uploads/users/' . $qrcodeImageName);
+                    }
+
+                    $data['image'] = $qrcodeImageName;
+                    if ($width > $height) {
+                        $data['width'] = $height;
+                        $data['height'] = $height;
+                    } elseif ($width < $height) {
+                        $data['width'] = $width;
+                        $data['height'] = $width;
+                    } else {
+                        $data['width'] = $width;
+                        $data['height'] = $height;
+                    }
+                    $this->layout->content = View::make('/Users/paymentQrcode')
+                            ->with('userData', $userData)
+                            ->with('data', $data);
+                }
+
+                if (isset($input['add_photo'])) {
+
+                    $manipulator = new ImageManipulator('uploads/users/' . $input['payment_qrcode']);
+                    $width = $manipulator->getWidth();
+                    $height = $manipulator->getHeight();
+                    $centreX = round($width / 2);
+                    $centreY = round($height / 2);
+                    // our dimensions will be 200x130
+                    $x1 = $centreX - $input['w'] / 2; // 200 / 2
+                    $y1 = $centreY - $input['h'] / 2; // 130 / 2
+
+                    $x2 = $centreX + 100; // 200 / 2
+                    $y2 = $centreY + 65; // 130 / 2
+                    //
+//                    echo "<pre>";
+//                    print_r($input);
+                    // center cropping to 200x130
+                    $newImage = $manipulator->crop($input['x'], $input['y'], $input['w'], $input['h']);
+
+                    // saving file to uploads folder
+                    $manipulator->save("uploads/users/" . $input['payment_qrcode']);
+
+                    // update it to database
+                    $data = array(
+                        'payment_qrcode' => $input['payment_qrcode'],
+                    );
+                    DB::table('users')
+                            ->where('id', $user_id)
+                            ->update($data);
+
+                    // remove old image
+                    @unlink(UPLOAD_FULL_PROFILE_IMAGE_PATH . $userData->payment_qrcode);
+
+                    // return to error/success message
+                   
+        $user_id = Session::get('user_id');
+        $payment_qrcode_data = DB::table('users')->where('id', $user_id)->first();
+        return Redirect::to('/order/paymentQrcode')->with('userData', $userData)->with('success_message', 'QR code Image updated successfully.');
+                $this->layout->content = View::make('Users/paymentQrcode')->with('userData', $userData);
+            
+                }
+            }
+        
+        }
+        // Show the page
+        
+    }
 
     function notify_customer($orderSlug = NULL) {
         $this->layout = false;

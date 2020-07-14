@@ -597,6 +597,8 @@
         var href = $(this).attr("href");
         var min_order = $("#xcff").val();
         var total = parseFloat($(".summary p strong").attr('data-total'));
+        console.log(total);
+        console.log(min_order);
         //alert(total);
         if (total < min_order) {
             swal({
@@ -2328,15 +2330,16 @@ function formatNumber (num) {
         htmlCont += '<div class="_ttb"><label>Total:</label> <?php foreach(Config::get('constant') as $key => $c) { 
                                                                     if($key == $currency)
                                                                         {
-                                                                          echo $c; } } ?><span id="ton"> ' +  formatNumber(total.toFixed(2)) + '</span></div>';
-
+                                                                          echo $c; } } ?><span id="ton"> ' +  total.toFixed(2) + '</span></div>';
+/*<span id="ton"> ' +  formatNumber(total.toFixed(2)) + '</span></div>*/
         //htmlCont += '<div class="_ttb"><label>Total:</label> {{CURR}}<span id="ton"> ' + total.toFixed(2) + '</span></div>';
         $('#summary').html(htmlCont);
 
         if ($('#ton').html().trim() > 0) {
             $('.left_main2').show();
         } else {
-            $('.left_main2').hide();
+            //$('.left_main2').show();
+             $('.left_main2').hide();
         }
 
     });
@@ -2347,6 +2350,56 @@ function formatNumber (num) {
     });
     $('body').delegate('click', '.namce', function (e) {
         $('#myModal').show();
+        var cur_day = moment().tz(timezone).format("ddd");
+    var current_day = cur_day.toLowerCase();
+    var oc_start_time = <?php echo json_encode($startime_1); ?>;
+    var oc_end_time = <?php echo json_encode($endtime_2); ?>;
+    var oc_brtime_time = <?php echo json_encode($brtime_3); ?>;
+    var start;
+    if(typeof(oc_start_time[current_day]) != "undefined" && oc_start_time[current_day] !== null) {
+         start = oc_start_time[current_day];
+    }
+    var end;
+    if(typeof(oc_end_time[current_day]) != "undefined" && oc_end_time[current_day] !== null) {
+         end = oc_end_time[current_day];
+    }
+    var brstart;
+    if(typeof(oc_brtime_time[current_day]) != "undefined" && oc_brtime_time[current_day] !== null) {
+         brstart = oc_brtime_time[current_day];
+    }
+    var exlunch = start.split(',');
+    var exdinner = end.split(',');
+    var exbreak = brstart.split(',');
+    
+    var lunch = exlunch[0].split('to');
+    var lunch_1 = moment(lunch[0],"YYYY/MM/DD[T]HH:mm:ssZ").tz(timezone).format("HH:mm:ss");
+    var lunch_2 = moment(lunch[1],"YYYY/MM/DD[T]HH:mm:ssZ").tz(timezone).format("HH:mm:ss");
+    
+    var dinner = exdinner[0].split('to');
+    var dinner_1 = moment(dinner[0],"YYYY/MM/DD[T]HH:mm:ssZ").tz(timezone).format("HH:mm:ss");
+    var dinner_2 = moment(dinner[1],"YYYY/MM/DD[T]HH:mm:ssZ").tz(timezone).format("HH:mm:ss");
+    
+    var break_time = exbreak[0].split('to');
+    var break_time_1 = moment(break_time[0],"YYYY/MM/DD[T]HH:mm:ssZ").tz(timezone).format("HH:mm:ss");
+    var break_time_2 = moment(break_time[1],"YYYY/MM/DD[T]HH:mm:ssZ").tz(timezone).format("HH:mm:ss");
+    
+    var time_according_timezone = moment().tz(timezone).format("HH:mm:ss")
+    if(((typeof(exbreak) != "undefined" || exbreak !== null) &&  break_time.length == 2 && time_according_timezone >= break_time_1) && ((typeof(exbreak) != "undefined" || exbreak !== null) && time_according_timezone <= break_time_2) && ($.inArray(current_day, open_days) !== -1))
+    {
+        $('#myModal').show();
+    }
+    else if(((typeof(exlunch) != "undefined" || exlunch !== null) &&  lunch.length == 2 && time_according_timezone >= lunch_1) && ((typeof(exlunch) != "undefined" || exlunch !== null) && time_according_timezone <= lunch_2) && ($.inArray(current_day, open_days) !== -1))
+    {
+        $('#myModal').show();
+    }
+    else if(((typeof(exdinner) != "undefined" || exdinner !== null) &&  dinner.length == 2 && time_according_timezone >= dinner_1) && ((typeof(exdinner) != "undefined" || exdinner !== null) && time_according_timezone <= dinner_2) && ($.inArray(current_day, open_days) !== -1))
+    {
+        $('#myModal').show();
+    }
+    else
+    {
+        $('#myModal').hide();
+    }
         var dataid = $(this).attr('data-id');
         $.ajax({
             url: "<?php echo HTTP_PATH . "home/getmenu" ?>/" + dataid,
@@ -2354,7 +2407,23 @@ function formatNumber (num) {
             type: 'GET',
             success: function (data, textStatus, XMLHttpRequest)
             {
-                $('#myModal').show();
+                             if(((typeof(exbreak) != "undefined" || exbreak !== null) &&  break_time.length == 2 && time_according_timezone >= break_time_1) && ((typeof(exbreak) != "undefined" || exbreak !== null) && time_according_timezone <= break_time_2) && ($.inArray(current_day, open_days) !== -1))
+    {
+        $('#myModal').show();
+    }
+    else if(((typeof(exlunch) != "undefined" || exlunch !== null) &&  lunch.length == 2 && time_according_timezone >= lunch_1) && ((typeof(exlunch) != "undefined" || exlunch !== null) && time_according_timezone <= lunch_2) && ($.inArray(current_day, open_days) !== -1))
+    {
+        $('#myModal').show();
+    }
+    else if(((typeof(exdinner) != "undefined" || exdinner !== null) &&  dinner.length == 2 && time_according_timezone >= dinner_1) && ((typeof(exdinner) != "undefined" || exdinner !== null) && time_according_timezone <= dinner_2) && ($.inArray(current_day, open_days) !== -1))
+    {
+        $('#myModal').show();
+    }
+    else
+    {
+        $('#myModal').hide();
+    }
+       
                 $('#innercontent').html(data);
             },
             error: function (XMLHttpRequest, textStatus, errorThrown)
@@ -2652,6 +2721,7 @@ function formatNumber (num) {
     if(((typeof(exbreak) != "undefined" || exbreak !== null) &&  break_time.length == 2 && time_according_timezone >= break_time_1) && ((typeof(exbreak) != "undefined" || exbreak !== null) && time_according_timezone <= break_time_2) && ($.inArray(current_day, open_days) !== -1))
     {
         $('#open_status').html('<span class="open same_style">Open</span>');
+        //$('#myModal').show();
     }
     else if(((typeof(exlunch) != "undefined" || exlunch !== null) &&  lunch.length == 2 && time_according_timezone >= lunch_1) && ((typeof(exlunch) != "undefined" || exlunch !== null) && time_according_timezone <= lunch_2) && ($.inArray(current_day, open_days) !== -1))
     {
@@ -2663,10 +2733,14 @@ function formatNumber (num) {
     }
     else
     {
-        $('#shop_status').html('<div class="no-record-list">Sorry the restaurant has closed at the moment!</div>')
+        /*$('#shop_status').html('<div class="no-record-list">Sorry the restaurant has closed at the moment!</div>')
         $('#left_new_section').html('');
-        $('#left_menu_right').html('');
-        $('#open_status').html('<span class="closee same_style">closed</span>'); 
+        $('#left_menu_right').html('');*/
+        
+         $('#open_status').html('<span class="closee same_style">closed</span>'); 
+        $('#myModal').hide();
+        $('#innercontent').html("");
+         $('.showcartloader').hide();
     }
     
     /*var set_unset = "<?php //echo $set_unset; ?>"
